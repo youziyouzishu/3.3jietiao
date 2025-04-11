@@ -35,6 +35,9 @@ use plugin\admin\app\model\Base;
  * @property int $pay_type 支付类型:0=无,1=微信
  * @property-read mixed $status_text
  * @property string|null $deleted_at 删除时间
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt withTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt withoutTrashed()
  * @mixin \Eloquent
  */
 class Receipt extends Base

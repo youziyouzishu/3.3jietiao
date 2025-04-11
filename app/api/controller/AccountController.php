@@ -27,9 +27,12 @@ class AccountController extends Base
         $idcard = $request->post('idcard');
         $trade_password = $request->post('trade_password');
 
-        $user = User::where('idcard', $idcard)->where('truename', $truename)->where('trade_password', Util::passwordHash($trade_password))->first();
+        $user = User::where('idcard', $idcard)->where('truename', $truename)->first();
         if (!$user){
             return $this->fail('用户不存在');
+        }
+        if (!Util::passwordVerify($trade_password, $user->trade_password)) {
+            return $this->fail('交易密码错误');
         }
 
         $user->last_time = Carbon::now()->toDateTimeString();
@@ -50,7 +53,6 @@ class AccountController extends Base
         $idcard = $request->post('idcard');
         $trade_password = $request->post('trade_password');
         $confirm_trade_password = $request->post('confirm_trade_password');
-        $eid_token = $request->post('eid_token');
         $code = $request->post('code');
 
         if ($trade_password != $confirm_trade_password) {
@@ -107,26 +109,36 @@ class AccountController extends Base
     #更改密码
     function changePassword(Request $request)
     {
-        $mobile = $request->post('mobile');
-        $captcha = $request->post('captcha');
-        $password = $request->post('password');
-        $password_confirm = $request->post('password_confirm');
-        if ($password != $password_confirm) {
-            return $this->fail('两次密码不一致');
+        $truename = $request->post('truename');
+        $idcard = $request->post('idcard');
+        $trade_password = $request->post('trade_password');
+        $confirm_trade_password = $request->post('confirm_trade_password');
+        $eid_token = $request->post('eid_token');
+        if ($trade_password != $confirm_trade_password) {
+            return $this->fail('两次交易密码不一致');
         }
-        if (strlen($password) < 6) {
-            return $this->fail('密码长度不能小于6位');
+        if (strlen($trade_password) != 6) {
+            return $this->fail('交易密码长度必须是6位');
         }
-        $captchaResult = Sms::check($mobile, $captcha, 'changepwd');
-        if (!$captchaResult) {
-            return $this->fail('验证码错误');
-        }
-        $user = User::where('mobile', $mobile)->first();
-        if (!$user) {
+
+        $exists = User::where('idcard', $idcard)->first();
+        if ($exists) {
             return $this->fail('用户不存在');
         }
-        $user->password = Util::passwordHash($password);
-        $user->save();
+
+        $cred = new Credential('AKIDoVGvRlurcAqTXSBj5FDzZyEKH6kCVijY', 'gTF043sX1JPKl6NZaP2a1JXo5OdhbKrC');
+        $httpProfile = new HttpProfile();
+        $httpProfile->setEndpoint('faceid.tencentcloudapi.com');
+        $clientProfile = new ClientProfile();
+        $clientProfile->setHttpProfile($httpProfile);
+        $client = new FaceidClient($cred, '', $clientProfile);
+        $req = new GetEidResultRequest();
+        $params = ['EidToken' => $eid_token];
+        $req->fromJsonString(json_encode($params));
+        $resp = $client->GetEidResult($req);
+        // 输出json格式的字符串回包
+        $result = $resp->toJsonString();
+
         return $this->success('修改成功');
     }
 

@@ -58,5 +58,9 @@ return [
                 'enable_memory_monitor' => DIRECTORY_SEPARATOR === '/',
             ]
         ]
-    ]
+    ],
+//    'websocket_test' => [
+//        // 这里指定进程类，就是上面定义的Pusher类
+//        'handler' => app\Pusher::class,
+//    ],
 ];
