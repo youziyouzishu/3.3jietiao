@@ -9,7 +9,7 @@ use plugin\admin\app\controller\Crud;
 use support\exception\BusinessException;
 
 /**
- * 轮播图管理 
+ * 轮播图 
  */
 class BannerController extends Crud
 {
