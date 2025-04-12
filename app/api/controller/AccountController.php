@@ -2,12 +2,14 @@
 
 namespace app\api\controller;
 
+use app\admin\model\EidToken;
 use app\admin\model\Sms;
 use app\admin\model\User;
 use app\api\basic\Base;
 use Carbon\Carbon;
 use EasyWeChat\MiniApp\Application;
 use plugin\admin\app\common\Util;
+use support\Log;
 use support\Request;
 use TencentCloud\Common\Credential;
 use TencentCloud\Common\Profile\ClientProfile;
@@ -54,6 +56,7 @@ class AccountController extends Base
         $trade_password = $request->post('trade_password');
         $confirm_trade_password = $request->post('confirm_trade_password');
         $code = $request->post('code');
+        $eid_token = $request->post('eid_token');
 
         if ($trade_password != $confirm_trade_password) {
             return $this->fail('两次交易密码不一致');
@@ -67,6 +70,15 @@ class AccountController extends Base
             return $this->fail('用户已存在');
         }
 
+
+        $eidToken = EidToken::where('token',$eid_token)->first();
+        if(!$eidToken){
+            return $this->fail('人脸核身Token不存在');
+        }
+        if ($eidToken->truename !== $truename || $eidToken->idcard !== $idcard){
+            return $this->fail('身份与核验信息不符');
+        }
+
         $cred = new Credential('AKIDoVGvRlurcAqTXSBj5FDzZyEKH6kCVijY', 'gTF043sX1JPKl6NZaP2a1JXo5OdhbKrC');
         $httpProfile = new HttpProfile();
         $httpProfile->setEndpoint('faceid.tencentcloudapi.com');
@@ -77,8 +89,11 @@ class AccountController extends Base
         $params = ['EidToken' => $eid_token];
         $req->fromJsonString(json_encode($params));
         $resp = $client->GetEidResult($req);
-        // 输出json格式的字符串回包
-        $result = $resp->toJsonString();
+        $ErrCode = $resp->Text->ErrCode;
+        if($ErrCode !== 0){
+            return $this->fail('人脸核身失败');
+        }
+
 
         $config = config('wechat.UserMiniApp');
         $app = new Application($config);
@@ -121,9 +136,17 @@ class AccountController extends Base
             return $this->fail('交易密码长度必须是6位');
         }
 
-        $exists = User::where('idcard', $idcard)->first();
-        if ($exists) {
+        $user = User::where('idcard', $idcard)->where('truename', $truename)->first();
+        if (!$user) {
             return $this->fail('用户不存在');
+        }
+
+        $eidToken = EidToken::where('token',$eid_token)->first();
+        if(!$eidToken){
+            return $this->fail('人脸核身Token不存在');
+        }
+        if ($eidToken->truename !== $truename || $eidToken->idcard !== $idcard){
+            return $this->fail('身份与核验信息不符');
         }
 
         $cred = new Credential('AKIDoVGvRlurcAqTXSBj5FDzZyEKH6kCVijY', 'gTF043sX1JPKl6NZaP2a1JXo5OdhbKrC');
@@ -136,9 +159,13 @@ class AccountController extends Base
         $params = ['EidToken' => $eid_token];
         $req->fromJsonString(json_encode($params));
         $resp = $client->GetEidResult($req);
-        // 输出json格式的字符串回包
-        $result = $resp->toJsonString();
+        $ErrCode = $resp->Text->ErrCode;
+        if($ErrCode !== 0){
+            return $this->fail('人脸核身失败');
+        }
 
+        $user->trade_password = Util::passwordHash($trade_password);
+        $user->save();
         return $this->success('修改成功');
     }
 

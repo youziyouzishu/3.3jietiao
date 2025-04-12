@@ -4,7 +4,6 @@ namespace app\api\controller;
 
 use app\admin\model\User;
 use app\api\basic\Base;
-use app\Pusher;
 use support\Request;
 use Workerman\Connection\AsyncTcpConnection;
 
