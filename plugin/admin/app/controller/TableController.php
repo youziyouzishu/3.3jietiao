@@ -743,6 +743,7 @@ EOF;
      */
     protected function createTemplate($template_file_path, $table, $url_path_base, $primary_key, $controller_class_with_namespace)
     {
+
         $this->mkdir($template_file_path . '/index.html');
         $code_base = Util::controllerToUrlPath($controller_class_with_namespace);
         $code_base = str_replace('/', '.', trim($code_base, '/'));
@@ -773,6 +774,7 @@ EOF
             : '';
         $html = str_replace("\n", "\n" . str_repeat('    ', 2), $html);
         $js = $form->js(3);
+
         $table_js = Layui::buildTable($table, 4);
         $template_content = <<<EOF
 
@@ -987,6 +989,7 @@ EOF;
         file_put_contents("$template_file_path/index.html", $template_content);
 
         $form = Layui::buildForm($table);
+
         $html = $form->html(5);
         $js = $form->js(3);
         $template_content = <<<EOF
@@ -1029,7 +1032,7 @@ EOF;
         <script src="/app/admin/admin/js/permission.js"></script>
         
         <script>
-
+            
             // 相关接口
             const INSERT_API = "$url_path_base/insert";
             $js
@@ -1074,6 +1077,8 @@ EOF;
         file_put_contents("$template_file_path/insert.html", $template_content);
 
         $form = Layui::buildForm($table, 'update');
+
+
         $html = $form->html(5);
         $js = $form->js(6);
         $template_content = <<<EOF
@@ -1121,7 +1126,6 @@ EOF;
             const PRIMARY_KEY = "$primary_key";
             const SELECT_API = "$url_path_base/select" + location.search;
             const UPDATE_API = "$url_path_base/update";
-
             // 获取数据库记录
             layui.use(["form", "util", "popup"], function () {
                 let $ = layui.$;
@@ -1143,6 +1147,19 @@ EOF;
                             } else {
                                 obj.attr("value", value);
                                 obj[0].value = value;
+                            }
+                            
+                            // 多图渲染
+                            if (obj[0].classList.contains('uploader-list')) {
+                                let multiple_images = value.split(",");
+                                $.each(multiple_images, function(index, value) {
+                                    $('#uploader-list-'+ key).append(
+                                        '<div class="file-iteme">' +
+                                        '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                        '<img src='+value +' alt="'+ value +'" >' +
+                                        '</div>'
+                                    );
+                                });
                             }
                         });
                         $js

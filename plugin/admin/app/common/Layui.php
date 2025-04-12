@@ -368,6 +368,8 @@ EOF;
         [$label, $field, $value, $props, $verify_string, $required_string, $class] = $this->options($options);
         $props['acceptMime'] = $props['acceptMime'] ?? 'image/gif,image/jpeg,image/jpg,image/png';
         $props['url'] = $props['url'] ?? '/app/admin/upload/image';
+        $props['multiple'] = $props['multiple'] ? 1 : 0;
+
         $id = $this->createId($field);
 
         unset($props['lay-verify']);
@@ -376,7 +378,8 @@ EOF;
         $props = $this->prepareProps($props);
         $options_string .= "\n" . $this->preparePropsToJsObject($props, 1, true);
 
-        $this->htmlContent .= <<<EOF
+        if ($props['multiple'] == 0){
+            $this->htmlContent .= <<<EOF
 
 <div class="layui-form-item">
     $label
@@ -393,7 +396,7 @@ EOF;
 </div>
 
 EOF;
-        $this->jsContent .= <<<EOF
+            $this->jsContent .= <<<EOF
 
 // 字段 {$options['label']} $field
 layui.use(["upload", "layer"], function() {
@@ -414,6 +417,7 @@ layui.use(["upload", "layer"], function() {
     });
     layui.upload.render({
         elem: "#$id",$options_string
+        url: {$props['url']},
         done: function (res) {
             if (res.code > 0) return layui.layer.msg(res.msg);
             this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
@@ -422,6 +426,96 @@ layui.use(["upload", "layer"], function() {
 });
 
 EOF;
+        }else{
+            $this->htmlContent .= <<<EOF
+
+<div class="layui-form-item">
+    $label
+    <div class="$class">
+    
+        <div class="layui-upload">
+           <input type="text" class="uploader-list" style="display:none" name="$field" value="$value" id="$id"/>
+           <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+               预览图：
+               <div class="layui-upload-list uploader-list" style="overflow: auto;" id="uploader-list-$id">
+               </div>
+           </blockquote>
+
+           <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="multi-upload-$id">
+               <i class="layui-icon layui-icon-upload"></i>多图上传
+           </button>
+       </div>
+    </div>
+</div>
+
+EOF;
+            $this->jsContent .= <<<EOF
+
+// 字段 {$options['label']} $field
+layui.use(["upload", "layer"], function() {
+    var upload = layui.upload;
+    var $ = layui.$;
+    let multiple_images = layui.$("#$id").attr("value").split(",");
+    upload.render({
+        elem: '#multi-upload-$id',
+        url: {$props['url']},
+        multiple: true,
+        before: function(obj){
+       layer.msg('图片上传中...', {
+           icon: 16,
+           shade: 0.01,
+           time: 0
+       })
+   },
+   done: function(res){
+       layer.close(layer.msg());//关闭上传提示窗口
+       //上传完毕
+       $('#uploader-list-$id').append(
+           '<div class="file-iteme">' +
+           '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+           '<img src='+ res.data.url +' alt="'+ res.data.name +'" >' +
+           '</div>'
+       );
+
+       //追加图片成功追加文件名至图片容器
+       multiple_images.push(res.data.url);
+       $('#$id').val(multiple_images);
+   }
+});
+
+//鼠标悬浮事件
+$(document).on("mouseenter mouseleave", ".file-iteme", function(event){
+   if(event.type === "mouseenter"){
+       //鼠标悬浮
+       $(this).children(".info").fadeIn("fast");
+       $(this).children(".handle").fadeIn("fast");
+   }else if(event.type === "mouseleave") {
+       //鼠标离开
+       $(this).children(".info").hide();
+       $(this).children(".handle").hide();
+   }
+});
+
+// 删除图片
+$(document).on("click", ".file-iteme .handle", function(event){
+   var delImg = $(this).parent().children("img").attr("src")
+   var index = multiple_images.indexOf(delImg);
+   if (index !== -1) {
+       multiple_images.splice(index, 1);
+   }
+   //重新赋值
+   $('#$id').val(multiple_images);
+   //删除标签
+   $(this).parent().remove();
+});
+//多图上传 end
+
+});
+
+EOF;
+        }
+
+
 
     }
 
@@ -938,12 +1032,27 @@ EOF;
 EOF;
                     break;
                 case 'uploadimage':
-                    $templet = <<<EOF
+                    $props = Util::getControlProps($info['control'], $info['control_args']);
+                    $multiple = $props['multiple'] ?? 0;
+                    if ($multiple == 0){
+                        $templet = <<<EOF
 
 		templet: function (d) {
 			return '<img src="'+encodeURI(d['$field'])+'" style="max-width:32px;max-height:32px;" alt="" />'
 		}
 EOF;
+                    }else{
+                        $templet = <<<EOF
+		                templet: function (d) {
+                            const images = d['$field'].split(',');
+                            let html = '';
+                            for (let img of images) {
+                                html += '<img src="' + encodeURI(img.trim()) + '" style="max-width:32px;max-height:32px;" alt="" />';
+                            }
+                            return html;
+						}
+EOF;
+                    }
                     break;
 
             }
