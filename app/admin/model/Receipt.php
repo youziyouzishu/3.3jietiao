@@ -15,8 +15,6 @@ use plugin\admin\app\model\Base;
  * @property string $amount 欠款金额
  * @property int $repayment_type 还款方式:1=一次性还本付息,2=分期还款
  * @property float $rate 年化利率
- * @property string|null $start_date 起始日期
- * @property string|null $end_date 还款日期
  * @property string|null $reason 欠款原因
  * @property string|null $mark 原因详情
  * @property int|null $stage 分期期数
@@ -38,6 +36,14 @@ use plugin\admin\app\model\Base;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt onlyTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt withoutTrashed()
+ * @property \Illuminate\Support\Carbon|null $start_date 起始日期
+ * @property \Illuminate\Support\Carbon|null $end_date 还款日期
+ * @property-read mixed $repayment_type_text
+ * @property string|null $clause_rule 条款协议
+ * @property string|null $borrow_rule 借款协议
+ * @property string|null $cert_rule 授权协议
+ * @property-read mixed $pay_type_text
+ * @property string|null $pay_time 支付时间
  * @mixin \Eloquent
  */
 class Receipt extends Base
@@ -57,6 +63,11 @@ class Receipt extends Base
      */
     protected $primaryKey = 'id';
 
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
     protected $fillable = [
         'user_id',
         'to_user_id',
@@ -74,11 +85,17 @@ class Receipt extends Base
         'created_at',
         'updated_at',
         'ordersn',
-        'pay_amount'
+        'pay_amount',
+        'pay_type',
+        'clause_rule',
+        'borrow_rule',
+        'cert_rule',
     ];
 
     protected $appends = [
-        'status_text'
+        'status_text',
+        'repayment_type_text',
+        'pay_type_text',
     ];
 
     function user()
@@ -108,6 +125,37 @@ class Receipt extends Base
             4 => '已失效',
         ];
     }
+
+    function getRepaymentTypeTextAttribute($value)
+    {
+        $value = $value ? $value : $this->repayment_type;
+        $list = $this->getRepaymentTypeList();
+        return $list[$value] ?? '';
+    }
+
+    function getRepaymentTypeList()
+    {
+        return [
+            1 => '一次性还本付息',
+            2 => '分期还款',
+        ];
+    }
+
+    function getPayTypeTextAttribute($value)
+    {
+        $value = $value ? $value : $this->pay_type;
+        $list = $this->getPayTypeList();
+        return $list[$value] ?? '';
+    }
+
+    function getPayTypeList()
+    {
+        return [
+            0 => '无',
+            1 => '微信',
+        ];
+    }
+
 
 
 }

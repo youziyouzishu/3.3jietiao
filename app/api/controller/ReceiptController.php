@@ -7,6 +7,7 @@ use app\admin\model\User;
 use app\api\basic\Base;
 use app\api\service\Pay;
 use plugin\admin\app\common\Util;
+use setasign\Fpdi\Tfpdf\Fpdi;
 use support\Log;
 use support\Request;
 use support\Response;
@@ -84,7 +85,8 @@ class ReceiptController extends Base
             }
         }
         $user = User::find($request->user_id);
-        if ($user->trade_password != Util::passwordHash($trade_password)) {
+
+        if (!Util::passwordVerify($trade_password,$user->trade_password)) {
             return $this->fail('交易密码错误');
         }
         if ($amount > 100 && $amount < 10000) {
@@ -111,7 +113,9 @@ class ReceiptController extends Base
         if ($amount > 1000000) {
             $pay_amount = 99.8;
         }
-
+        if (!isset($pay_amount)){
+            return $this->fail('金额范围错误');
+        }
 
 
         $receipt = Receipt::create([
@@ -129,8 +133,81 @@ class ReceiptController extends Base
             'stage_amount' => $stage_amount,
             'ordersn' => Pay::generateOrderSn(),
             'pay_amount' => $pay_amount,
-            'status' => 0
         ]);
+        $receipt->refresh();
+        // 初始化 FPDI
+        $pdf = new Fpdi();
+        // 导入现有 PDF 文件的第一页
+        $pageCount = $pdf->setSourceFile(public_path('借款协议.pdf'));
+        for ($i = 1; $i <= $pageCount; $i++) {
+            // 导入 PDF 文件的每一页
+            $templateId = $pdf->importPage($i);
+            $pdf->AddPage();
+            $pdf->useTemplate($templateId);
+            $pdf->AddFont('SIMHEI','','SIMHEI.TTF',true);
+            $pdf->SetFont('SIMHEI', );
+            if ($i == 1){
+                $pdf->SetFontSize(10);
+                $pdf->Text(56,45.5, $receipt->ordersn);
+                $pdf->Text(56,78.3, $receipt->toUser->truename);
+                $pdf->Text(56,83.7, $receipt->toUser->idcard);
+                $pdf->Text(56,89, $receipt->user->truename);
+                $pdf->Text(56,94.7, $receipt->user->idcard);
+
+                $pdf->Text(56,134, $receipt->amount);
+                $pdf->Text(56,140, $receipt->rate);
+                $pdf->Text(56,147, $receipt->rate * $receipt->rate / 100  * $receipt->start_date->diffInDays($receipt->end_date));
+                $pdf->Text(56,153.5, $receipt->rate * $receipt->rate / 100  * $receipt->start_date->diffInDays($receipt->end_date) + $receipt->amount);
+                $pdf->Text(56,160, $receipt->rate * $receipt->rate / 100  * $receipt->start_date->diffInDays($receipt->end_date) + $receipt->amount);
+                $pdf->Text(56,166.5, $receipt->repayment_type_text);
+                $pdf->Text(56,173.5, $receipt->start_date->toDateString());
+                $pdf->Text(56,180, $receipt->end_date->toDateString());
+                $pdf->Text(56,186.5, $receipt->reason);
+            }
+            if ($i == 4){
+                $pdf->SetFontSize(10);
+                $pdf->Text(56,167, $receipt->user->truename);
+                $pdf->Text(56,172, $receipt->toUser->truename);
+                $pdf->Text(56,178, date('Y-m-d'));
+            }
+        }
+        // 输出 PDF 文件
+        $pdf->Output(public_path("/borrow/$receipt->id.pdf"), 'F'); // 保存为文件
+
+
+        // 导入现有 PDF 文件的第一页
+        $pageCount = $pdf->setSourceFile(public_path('授权确认书.pdf'));
+        for ($i = 1; $i <= $pageCount; $i++) {
+            // 导入 PDF 文件的每一页
+            $templateId = $pdf->importPage($i);
+            // 添加新页面（基于导入的页面）
+            $pdf->AddPage();
+            // 使用模板
+            $pdf->useTemplate($templateId);
+            $pdf->AddFont('SIMHEI','','SIMHEI.TTF',true);
+            $pdf->SetFont('SIMHEI', );
+            if ($i == 1){
+                $pdf->SetFontSize(10);
+                // 在页面上添加文本
+                $pdf->Text(60,45.3, $receipt->ordersn);
+                $pdf->Text(60,73, $receipt->toUser->truename);
+                $pdf->Text(60,78.5, $receipt->toUser->idcard);
+            }
+            if ($i == 7){
+                $pdf->SetFontSize(10);
+                // 在页面上添加文本
+                $pdf->Text(60,40.5, '叁凯商贸');
+                $pdf->Text(60,46, date('Y-m-d'));
+            }
+
+        }
+        // 输出 PDF 文件
+        $pdf->Output(public_path("/cert/$receipt->id.pdf"), 'F'); // 保存为文件
+        $receipt->clause_rule = '/出借人重要条款提示.pdf';
+        $receipt->borrow_rule = "/borrow/$receipt->id.pdf";
+        $receipt->cert_rule = "/cert/$receipt->id.pdf";
+        $receipt->save();
+
         return $this->success('添加成功', $receipt);
     }
 
@@ -185,7 +262,7 @@ class ReceiptController extends Base
         })->get();
         $count = $total->count();
         $amount = $total->sum('amount');
-        $rows = Receipt::where(function ($query) use ($type, $request,$truename) {
+        $rows = Receipt::with(['toUser','user'])->where(function ($query) use ($type, $request,$truename) {
             if ($type == 1) {
                 $query->where('to_user_id', $request->user_id);
                 if (!empty($truename)){
@@ -229,7 +306,7 @@ class ReceiptController extends Base
     function detail(Request $request)
     {
         $id = $request->post('id');
-        $receipt = Receipt::find($id);
+        $receipt = Receipt::with(['user','toUser'])->find($id);
         if (empty($receipt)) {
             return $this->fail('凭证不存在');
         }

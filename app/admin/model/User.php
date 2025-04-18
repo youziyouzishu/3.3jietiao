@@ -39,6 +39,7 @@ use support\Db;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
  * @property-read \app\admin\model\UsersFeedback|null $feedback
+ * @property int $contract_status 合同管理状态:0=关闭,1=开启
  * @mixin \Eloquent
  */
 class User extends Base

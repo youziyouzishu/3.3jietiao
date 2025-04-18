@@ -2,6 +2,7 @@
 
 namespace app\api\controller;
 
+use app\admin\model\Receipt;
 use app\admin\model\User;
 use app\api\basic\Base;
 use Carbon\Carbon;
@@ -64,6 +65,7 @@ class NotifyController extends Base
                     $res = $pay->callback($request->post());
                     $res = $res->resource;
                     $res = $res['ciphertext'];
+
                     $out_trade_no = $res['out_trade_no'];
                     $attach = $res['attach'];
                     $mchid = $res['mchid'];
@@ -90,6 +92,10 @@ class NotifyController extends Base
                 case 'alipay':
                     $pay = Pay::alipay($config);
                     $res = $pay->callback($request->post());
+                    $trade_status = $res->trade_status;
+                    if ($trade_status !== 'TRADE_SUCCESS'){
+                        throw new \Exception('支付失败');
+                    }
                     $out_trade_no = $res->out_trade_no;
                     $attach = $res->passback_params;
                     $paytype = 2;
@@ -120,8 +126,8 @@ class NotifyController extends Base
                     }
                     $order->user->save();
                     break;
-                case 'goods':
-                    $order = GoodsOrders::where(['ordersn' => $out_trade_no, 'status' => 0])->first();
+                case 'receipt':
+                    $order = Receipt::where(['ordersn' => $out_trade_no, 'status' => 0])->first();
                     if (!$order) {
                         throw new \Exception('订单不存在');
                     }

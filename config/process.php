@@ -26,7 +26,7 @@ return [
         'user' => '',
         'group' => '',
         'reusePort' => false,
-        'eventLoop' => '',
+        'eventLoop' => Workerman\Events\Fiber::class,
         'context' => [],
         'constructor' => [
             'requestClass' => Request::class,
@@ -59,8 +59,4 @@ return [
             ]
         ]
     ],
-//    'websocket_test' => [
-//        // 这里指定进程类，就是上面定义的Pusher类
-//        'handler' => app\Pusher::class,
-//    ],
 ];
