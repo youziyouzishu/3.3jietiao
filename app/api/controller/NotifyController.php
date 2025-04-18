@@ -131,7 +131,7 @@ class NotifyController extends Base
                     if (!$order) {
                         throw new \Exception('订单不存在');
                     }
-                    $order->status = 1;
+                    $order->status = 5;
                     $order->pay_time = Carbon::now();
                     $order->pay_type = $paytype;
                     $order->save();

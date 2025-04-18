@@ -20,7 +20,6 @@ use plugin\admin\app\model\Base;
  * @property int|null $stage 分期期数
  * @property int|null $stage_day 分期时长
  * @property string|null $stage_amount 每期应收
- * @property int $status 状态:0=待确认,1=待还款,2=已逾期,3=已还款,5=已失效
  * @property \Illuminate\Support\Carbon|null $created_at 创建时间
  * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt newModelQuery()
@@ -44,6 +43,11 @@ use plugin\admin\app\model\Base;
  * @property string|null $cert_rule 授权协议
  * @property-read mixed $pay_type_text
  * @property string|null $pay_time 支付时间
+ * @property string|null $sign 签名
+ * @property int $status 状态:0=待确认,1=待还款,2=已逾期,3=已还款,4=已失效,5=待签字
+ * @property string|null $clause_images 条款协议图片
+ * @property string|null $cert_images 授权协议图片
+ * @property string|null $borrow_images 借款协议图片
  * @mixin \Eloquent
  */
 class Receipt extends Base
@@ -123,6 +127,7 @@ class Receipt extends Base
             2 => '已逾期',
             3 => '已还款',
             4 => '已失效',
+            5 => '待签字',
         ];
     }
 
