@@ -206,7 +206,21 @@ class ReceiptController extends Base
         return $this->success('销账成功');
     }
 
-
+    function cancel(Request $request)
+    {
+        $id = $request->post('id');
+        $receipt = Receipt::find($id);
+        if ($receipt->user_id != $request->user_id) {
+            return $this->fail('只能出借方操作');
+        }
+        if (!in_array($receipt->status,[0,1,2])) {
+            return $this->fail('凭证状态异常');
+        }
+        $receipt->status = 4;
+        $receipt->cancel_time = Carbon::now();
+        $receipt->save();
+        return $this->success('取消成功');
+    }
 
 
     /**

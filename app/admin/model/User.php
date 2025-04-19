@@ -40,6 +40,8 @@ use support\Db;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
  * @property-read \app\admin\model\UsersFeedback|null $feedback
  * @property int $contract_status 合同管理状态:0=关闭,1=开启
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \app\admin\model\Receipt> $receipt
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \app\admin\model\Receipt> $toReceipt
  * @mixin \Eloquent
  */
 class User extends Base
@@ -126,6 +128,16 @@ class User extends Base
     function feedback()
     {
         return $this->hasOne(UsersFeedback::class, 'user_id', 'id');
+    }
+
+    function receipt()
+    {
+        return $this->hasMany(Receipt::class, 'user_id', 'id');
+    }
+
+    function toReceipt()
+    {
+        return $this->hasMany(Receipt::class, 'to_user_id', 'id');
     }
 
 

@@ -49,6 +49,7 @@ class ConfigController extends Crud
         $post = $request->post();
         $data['user_agreement'] = $post['user_agreement'] ?? '';
         $data['privacy_policy'] = $post['privacy_policy'] ?? '';
+        $data['lengthen_rule'] = $post['lengthen_rule'] ?? '';
         $data['kefu_qr'] = $post['kefu_qr'] ?? '';
         $data['app_name'] = $post['app_name'] ?? '';
         $data['app_year'] = $post['app_year'] ?? '';

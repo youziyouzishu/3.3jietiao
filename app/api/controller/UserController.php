@@ -4,6 +4,7 @@ namespace app\api\controller;
 
 use app\admin\model\Advice;
 use app\admin\model\EidToken;
+use app\admin\model\Receipt;
 use app\admin\model\Sms;
 use app\admin\model\User;
 use app\admin\model\UsersScoreLog;
@@ -353,6 +354,42 @@ class UserController extends Base
     function getAdviceList(Request $request)
     {
         $rows = Advice::where('user_id', $request->user_id)->latest()->paginate()->items();
+        return $this->success('获取成功', $rows);
+    }
+
+
+    /**
+     * 借入统计
+     * @param Request $request
+     * @return \support\Response
+     */
+    function getReceiptTotal(Request $request)
+    {
+        $user = User::find($request->user_id);
+        $status = $user->toReceipt();
+        $data['status1'] = ['num'=>$status->where(['status'=>1])->count(),'amount'=>$status->where(['status'=>1])->sum('amount')];
+        $data['status2'] = ['num'=>$status->where(['status'=>2])->count(),'amount'=>$status->where(['status'=>2])->sum('amount')];
+        $data['status3'] = ['num'=>$status->where(['status'=>3])->count(),'amount'=>$status->where(['status'=>3])->sum('amount')];
+        $data['status'] = ['num'=>$status->whereIn('status',[1,2,3])->count(),'amount'=>$status->whereIn('status',[1,2,3])->sum('amount')];
+        return $this->success('获取成功', $data);
+    }
+
+    /**
+     * 借入明细
+     * @param Request $request
+     * @return \support\Response
+     */
+    function getReceiptList(Request $request)
+    {
+        $amount_order = $request->post('amount_order','asc');
+        $end_date_order = $request->post('end_date_order','asc');
+        $rows = Receipt::where('to_user_id', $request->user_id)
+            ->with(['user','toUser'])
+            ->orderBy('amount',$amount_order)
+            ->orderBy('end_date',$end_date_order)
+            ->latest()
+            ->paginate()
+            ->items();
         return $this->success('获取成功', $rows);
     }
 
