@@ -48,6 +48,10 @@ use plugin\admin\app\model\Base;
  * @property string|null $clause_images 条款协议图片
  * @property string|null $cert_images 授权协议图片
  * @property string|null $borrow_images 借款协议图片
+ * @property string|null $interest 利息
+ * @property string|null $amount_and_interest 本息
+ * @property string|null $repaid_amount 已还金额
+ * @property string|null $outstanding_amount 待还金额
  * @mixin \Eloquent
  */
 class Receipt extends Base
@@ -94,6 +98,15 @@ class Receipt extends Base
         'clause_rule',
         'borrow_rule',
         'cert_rule',
+        'pay_time',
+        'sign',
+        'clause_images',
+        'cert_images',
+        'borrow_images',
+        'interest',
+        'amount_and_interest',
+        'repaid_amount',
+        'outstanding_amount',
     ];
 
     protected $appends = [

@@ -6,11 +6,13 @@ use app\admin\model\Receipt;
 use app\api\basic\Base;
 
 
+use Carbon\Carbon;
 use setasign\Fpdi\PdfReader\PdfReaderException;
 use setasign\Fpdi\Tfpdf\Fpdi;
 
 use Spatie\PdfToImage\Pdf;
 use support\Request;
+use Webman\RedisQueue\Client;
 
 class IndexController extends Base
 {
@@ -19,88 +21,7 @@ class IndexController extends Base
 
     function index(Request $request)
     {
-        $id = 13;
-        $receipt = Receipt::with(['user','toUser'])->find($id);
 
-
-        // PDF 文件路径
-        $pdfFile = public_path($receipt->borrow_rule);
-        // 初始化 PDF 对象
-        $pdf = new Pdf($pdfFile);
-        // 获取总页数
-        $pageCount = $pdf->pageCount();
-        $base64Images = [];
-        // 遍历每一页并转换为 Base64
-        for ($page = 1; $page <= $pageCount; $page++) {
-            // 创建临时文件路径
-            $tempImagePath = tempnam(sys_get_temp_dir(), 'pdf_image') . '.jpg';
-            try {
-                // 将当前页保存为图片
-                $pdf->selectPage($page)->save($tempImagePath);
-                // 读取图片内容并编码为 Base64
-                $imageData = file_get_contents($tempImagePath);
-                $base64Images[] = 'data:image/jpeg;base64,'.base64_encode($imageData);
-            } finally {
-                // 删除临时文件
-                if (file_exists($tempImagePath)) {
-                    unlink($tempImagePath);
-                }
-            }
-        }
-        $receipt->setAttribute('borrow_rule_images',$base64Images);
-
-        $pdfFile = public_path($receipt->cert_rule);
-        // 初始化 PDF 对象
-        $pdf = new Pdf($pdfFile);
-        // 获取总页数
-        $pageCount = $pdf->pageCount();
-        $base64Images = [];
-        // 遍历每一页并转换为 Base64
-        for ($page = 1; $page <= $pageCount; $page++) {
-            // 创建临时文件路径
-            $tempImagePath = tempnam(sys_get_temp_dir(), 'pdf_image') . '.jpg';
-            try {
-                // 将当前页保存为图片
-                $pdf->selectPage($page)->save($tempImagePath);
-                // 读取图片内容并编码为 Base64
-                $imageData = file_get_contents($tempImagePath);
-                $base64Images[] = 'data:image/jpeg;base64,'.base64_encode($imageData);
-            } finally {
-                // 删除临时文件
-                if (file_exists($tempImagePath)) {
-                    unlink($tempImagePath);
-                }
-            }
-        }
-        $receipt->setAttribute('cert_rule_images',$base64Images);
-        $pdfFile = public_path($receipt->clause_rule);
-        // 初始化 PDF 对象
-        $pdf = new Pdf($pdfFile);
-        // 获取总页数
-        $pageCount = $pdf->pageCount();
-        $base64Images = [];
-        // 遍历每一页并转换为 Base64
-        for ($page = 1; $page <= $pageCount; $page++) {
-            // 创建临时文件路径
-            $tempImagePath = tempnam(sys_get_temp_dir(), 'pdf_image') . '.jpg';
-            try {
-                // 将当前页保存为图片
-                $pdf->selectPage($page)->save($tempImagePath);
-                // 读取图片内容并编码为 Base64
-                $imageData = file_get_contents($tempImagePath);
-                $base64Images[] = 'data:image/jpeg;base64,'.base64_encode($imageData);
-            } finally {
-                // 删除临时文件
-                if (file_exists($tempImagePath)) {
-                    unlink($tempImagePath);
-                }
-            }
-        }
-        $receipt->setAttribute('clause_rule_images',$base64Images);
-        if (empty($receipt)) {
-            return $this->fail('凭证不存在');
-        }
-        return $this->success('获取成功', $receipt);
     }
 
     function shouquan(Request $request)

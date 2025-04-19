@@ -6,6 +6,7 @@ use app\admin\model\Receipt;
 use app\admin\model\User;
 use app\api\basic\Base;
 use app\api\service\Pay;
+use Carbon\Carbon;
 use plugin\admin\app\common\Util;
 use setasign\Fpdi\Tfpdf\Fpdi;
 use Spatie\PdfToImage\Pdf;
@@ -77,6 +78,7 @@ class ReceiptController extends Base
             }
         }
         if ($repayment_type == 2) {
+            return  $this->fail('分期还款暂未开放');
             if (empty($stage)) {
                 return $this->fail('分期期数不能为空');
             }
@@ -95,30 +97,37 @@ class ReceiptController extends Base
         if ($amount > 100 && $amount < 10000) {
             $pay_amount = 19.8;
         }
-        if ($amount > 10000 && $amount < 20000) {
+        if ($amount >= 10000 && $amount < 20000) {
             $pay_amount = 29.8;
         }
-        if ($amount > 20000 && $amount < 30000) {
+        if ($amount >= 20000 && $amount < 30000) {
             $pay_amount = 39.8;
         }
-        if ($amount > 30000 && $amount < 40000) {
+        if ($amount >= 30000 && $amount < 40000) {
             $pay_amount = 49.8;
         }
-        if ($amount > 40000 && $amount < 50000) {
+        if ($amount >= 40000 && $amount < 50000) {
             $pay_amount = 59.8;
         }
-        if ($amount > 50000 && $amount < 60000) {
+        if ($amount >= 50000 && $amount < 60000) {
             $pay_amount = 69.8;
         }
-        if ($amount > 60000 && $amount < 1000000) {
+        if ($amount >= 60000 && $amount < 1000000) {
             $pay_amount = 79.8;
         }
-        if ($amount > 1000000) {
+        if ($amount >= 1000000) {
             $pay_amount = 99.8;
         }
         if (!isset($pay_amount)){
             return $this->fail('金额范围错误');
         }
+        $start_date = Carbon::parse($start_date);
+        $end_date = Carbon::parse($end_date);
+        if ($start_date->gt($end_date)) {
+            return $this->fail('起始日期不能大于还款日期');
+        }
+        $interest = $rate * $rate / 100  * $start_date->diffInDays($end_date);
+        $amount_and_interest = $amount + $interest;
         DB::connection('plugin.admin.mysql')->beginTransaction();
         try {
             $receipt = Receipt::create([
@@ -136,6 +145,10 @@ class ReceiptController extends Base
                 'stage_amount' => $stage_amount,
                 'ordersn' => Pay::generateOrderSn(),
                 'pay_amount' => $pay_amount,
+                'interest' => $interest,
+                'amount_and_interest' => $amount_and_interest,
+                'repaid_amount' => 0,
+                'outstanding_amount' => $amount_and_interest,
             ]);
             Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
             DB::connection('plugin.admin.mysql')->commit();
