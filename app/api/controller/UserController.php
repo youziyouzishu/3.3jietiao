@@ -2,6 +2,7 @@
 
 namespace app\api\controller;
 
+use app\admin\model\Advice;
 use app\admin\model\EidToken;
 use app\admin\model\Sms;
 use app\admin\model\User;
@@ -13,6 +14,7 @@ use Carbon\Carbon;
 use EasyWeChat\OpenPlatform\Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use plugin\admin\app\common\Util;
 use plugin\admin\app\model\Option;
 use support\Request;
 use TencentCloud\Common\Credential;
@@ -306,6 +308,52 @@ class UserController extends Base
         $user->username = $new_mobile;
         $user->save();
         return $this->success('修改成功');
+    }
+
+
+    function changePassword(Request $request)
+    {
+        $old_password = $request->post('old_password');
+        $new_password = $request->post('new_password');
+        $confirm_password = $request->post('confirm_password');
+        if (strlen($new_password) != 6) {
+            return $this->fail('交易密码长度必须是6位');
+        }
+        if ($new_password != $confirm_password) {
+            return $this->fail('两次密码不一致');
+        }
+        $user = User::find($request->user_id);
+        if (!Util::passwordVerify($old_password, $user->trade_password)) {
+            return $this->fail('原密码错误');
+        }
+        $user->trade_password = Util::passwordHash($new_password);
+        $user->save();
+        return $this->success('修改成功');
+    }
+
+    function adviceAdd(Request $request)
+    {
+        $class_name = $request->post('class_name');
+        $content = $request->post('content');
+        $images = $request->post('images');
+        $truename = $request->post('truename');
+        $mobile = $request->post('mobile');
+
+        Advice::create([
+            'class_name' => $class_name,
+            'content' => $content,
+            'user_id' => $request->user_id,
+            'images' => $images,
+            'truename' => $truename,
+            'mobile' => $mobile,
+        ]);
+        return $this->success('反馈成功');
+    }
+
+    function getAdviceList(Request $request)
+    {
+        $rows = Advice::where('user_id', $request->user_id)->latest()->paginate()->items();
+        return $this->success('获取成功', $rows);
     }
 
 

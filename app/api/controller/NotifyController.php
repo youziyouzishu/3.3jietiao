@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use support\Db;
 use support\Log;
 use support\Request;
+use Webman\RedisQueue\Client;
 use Yansongda\Pay\Pay;
 
 class NotifyController extends Base
@@ -131,10 +132,11 @@ class NotifyController extends Base
                     if (!$order) {
                         throw new \Exception('订单不存在');
                     }
-                    $order->status = 5;
+                    $order->status = 1;
                     $order->pay_time = Carbon::now();
                     $order->pay_type = $paytype;
                     $order->save();
+                    Client::send('job', ['id' => $order->id, 'event' => 'generate_pdf']);
                     break;
                 case 'recharge':
                     $order = RechargeOrders::where(['ordersn' => $out_trade_no, 'status' => 0])->first();

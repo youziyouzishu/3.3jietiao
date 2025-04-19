@@ -5,8 +5,10 @@ namespace app\api\controller;
 use app\admin\model\Banner;
 use app\admin\model\EidToken;
 use app\api\basic\Base;
+use plugin\admin\app\model\Dict;
 use plugin\admin\app\model\Option;
 use support\Request;
+use support\Response;
 use TencentCloud\Common\Credential;
 use TencentCloud\Common\Profile\ClientProfile;
 use TencentCloud\Common\Profile\HttpProfile;
@@ -62,6 +64,13 @@ class CommonController extends Base
             'idcard'=>$idcard,
         ]);
         return $this->success('成功',$resp);
+    }
+
+
+    public function getDict(Request $request): Response
+    {
+        $name = $request->post('name');
+        return $this->json(0, 'ok', (array)Dict::get($name));
     }
 
 

@@ -150,7 +150,7 @@ class ReceiptController extends Base
                 'repaid_amount' => 0,
                 'outstanding_amount' => $amount_and_interest,
             ]);
-            Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
+            Client::send('job', ['id' => $receipt->id, 'event' => 'receipt_expire'],60*60*24);
             DB::connection('plugin.admin.mysql')->commit();
         }catch (\Throwable $e){
             DB::connection('plugin.admin.mysql')->rollBack();
@@ -162,6 +162,52 @@ class ReceiptController extends Base
         return $this->success('添加成功', $receipt);
     }
 
+    /**
+     * 展期
+     * @param Request $request
+     * @return Response
+     */
+    function lengthen(Request $request)
+    {
+        $id = $request->post('id');
+        $end_date = $request->post('end_date');
+        $receipt = Receipt::find($id);
+        if ($receipt->user_id != $request->user_id) {
+            return $this->fail('只能出借方操作');
+        }
+        if (!in_array($receipt->status,[1,2])) {
+            return $this->fail('凭证状态异常');
+        }
+        if (empty($end_date)) {
+            return $this->fail('还款日期不能为空');
+        }
+        $receipt->end_date = $end_date;
+        $receipt->save();
+        return $this->success('延长成功');
+    }
+
+    function writeAccount(Request $request)
+    {
+        $id = $request->post('id');
+        $amount = $request->post('amount');
+        $receipt = Receipt::find($id);
+        if ($receipt->user_id != $request->user_id) {
+            return $this->fail('只能出借方操作');
+        }
+        if (!in_array($receipt->status,[1,2])) {
+            return $this->fail('凭证状态异常');
+        }
+        $receipt->outstanding_amount -= $amount;
+        $receipt->repaid_amount += $amount;
+        if ($receipt->outstanding_amount <= 0){
+            $receipt->status = 3;
+        }
+        $receipt->save();
+        return $this->success('销账成功');
+    }
+
+
+
 
     /**
      * 支付
@@ -172,6 +218,10 @@ class ReceiptController extends Base
     {
         $ordersn = $request->post('ordersn');
         $pay_type = $request->post('pay_type');# 1微信
+        $sign = $request->post('sign');
+        if (empty($sign)) {
+            return $this->fail('签名不能为空');
+        }
         $receipt = Receipt::where(['ordersn' => $ordersn])->first();
         if (empty($receipt)) {
             return $this->fail('凭证不存在');
@@ -180,11 +230,13 @@ class ReceiptController extends Base
             return $this->fail('凭证状态异常');
         }
         if ($receipt->to_user_id != $request->user_id) {
-            return $this->fail('只能欠款方支付');
+            return $this->fail('只能借款方支付');
         }
         if ($pay_type == 1) {
             try {
                 $result = Pay::pay($pay_type, $receipt->pay_amount, $receipt->ordersn, '出证费', 'receipt');
+                $receipt->sign = $sign;
+                $receipt->save();
             } catch (\Throwable $e) {
                 Log::error('支付失败');
                 Log::error($e->getMessage());
@@ -196,22 +248,22 @@ class ReceiptController extends Base
         return $this->success('支付成功', $result);
     }
 
-    function sign(Request $request)
-    {
-        $id = $request->post('id');
-        $sign = $request->post('sign');
-        $receipt = Receipt::find($id);
-        if (empty($receipt)) {
-            return $this->fail('凭证不存在');
-        }
-        if ($receipt->status != 5) {
-            return $this->fail('凭证状态异常');
-        }
-        $receipt->sign = $sign;
-        $receipt->status = 1;
-        $receipt->save();
-        return $this->success('签名成功');
-    }
+//    function sign(Request $request)
+//    {
+//        $id = $request->post('id');
+//        $sign = $request->post('sign');
+//        $receipt = Receipt::find($id);
+//        if (empty($receipt)) {
+//            return $this->fail('凭证不存在');
+//        }
+//        if ($receipt->status != 5) {
+//            return $this->fail('凭证状态异常');
+//        }
+//        $receipt->sign = $sign;
+//        $receipt->status = 1;
+//        $receipt->save();
+//        return $this->success('签名成功');
+//    }
 
     function select(Request $request): Response
     {

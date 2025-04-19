@@ -43,6 +43,48 @@
                         </div>
 
                         <div class="layui-form-item">
+                            <label class="layui-form-label required">客服二维码</label>
+                            <div class="layui-input-block">
+                                <img class="img-4" src=""/>
+                                <input type="text" style="display:none" name="kefu_qr" value="" />
+                                <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="kefu_qr" permission="app.admin.upload.image">
+                                    <i class="layui-icon layui-icon-upload"></i>上传图片
+                                </button>
+                                <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-kefu_qr" permission="app.admin.upload.attachment">
+                                    <i class="layui-icon layui-icon-align-left"></i>选择图片
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">小程序名称</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="app_name"  lay-verify="required" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">运营年数</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="app_year"  lay-verify="required" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">注册用户数</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="user_count"  lay-verify="required" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">借条数量</label>
+                            <div class="layui-input-block">
+                                <input type="text" name="receipt_count"  lay-verify="required" autocomplete="off" class="layui-input">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
                             <div class="layui-input-block">
                                 <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="saveConfig">
                                     提交
@@ -65,12 +107,9 @@
 <script src="/app/admin/component/pear/pear.js"></script>
 <script src="/app/admin/admin/js/permission.js"></script>
 <script>
-    //多图上传 start
-    var multiple_images = []; //多图上传array,update也需要将这行放js最前面
-    const UPLOAD_API = "/app/admin/upload/image";
+
     layui.use(["tinymce"], function() {
         var tinymce = layui.tinymce
-
         var user_agreement = tinymce.render({
             elem: "#user_agreement",
             value: "",
@@ -137,6 +176,35 @@
     layui.use(["upload", "layer", "popup"], function() {
         let $ = layui.$;
         let form = layui.form;
+
+        // kefu_qr
+        let kefu_qr = $("#kefu_qr").prev();
+        kefu_qr.prev().attr("src", kefu_qr.val());
+        layui.$("#attachment-choose-kefu_qr").on("click", function() {
+            parent.layer.open({
+                type: 2,
+                title: "选择附件",
+                content: "/app/admin/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                area: ["95%", "90%"],
+                success: function (layero, index) {
+                    parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                        kefu_qr.val(data.url).prev().attr("src", data.url);
+                    });
+                }
+            });
+        });
+        layui.upload.render({
+            elem: "#kefu_qr",
+            url: "/app/admin/upload/image",
+            acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+            done: function (res) {
+                if (res.code) {
+                    return layui.popup.failure(res.msg);
+                }
+                this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+            }
+        });
+
         // 提交
         form.on("submit(saveConfig)", function(data){
             $.ajax({
@@ -169,6 +237,7 @@
                     return layui.popup.failure(res.msg);
                 }
                 form.val("config", res.data);
+                $("#kefu_qr").prev().val(res.data.kefu_qr).prev().attr("src", res.data.kefu_qr);
             }
         });
 

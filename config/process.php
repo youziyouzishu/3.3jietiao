@@ -59,4 +59,7 @@ return [
             ]
         ]
     ],
+    'task'  => [
+        'handler'  => app\process\Task::class
+    ],
 ];
