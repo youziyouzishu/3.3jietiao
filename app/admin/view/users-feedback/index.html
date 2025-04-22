@@ -15,6 +15,13 @@
                 <form class="layui-form top-search-from">
                     
                     <div class="layui-form-item">
+                        <label class="layui-form-label">主键</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="id" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
                         <label class="layui-form-label">创建时间</label>
                         <div class="layui-input-block">
                             <div class="layui-input-block" id="created_at">
@@ -51,18 +58,18 @@
 
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="admin.banner.insert">
+            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="admin.usersfeedback.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
-            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="admin.banner.delete">
+            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="admin.usersfeedback.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="admin.banner.update">编辑</button>
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="admin.banner.delete">删除</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="admin.usersfeedback.update">编辑</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="admin.usersfeedback.delete">删除</button>
         </script>
 
         <script src="/app/admin/component/layui/layui.js?v=2.8.12"></script>
@@ -74,11 +81,11 @@
 
             // 相关常量
             const PRIMARY_KEY = "id";
-            const SELECT_API = "/admin/banner/select";
-            const UPDATE_API = "/admin/banner/update";
-            const DELETE_API = "/admin/banner/delete";
-            const INSERT_URL = "/admin/banner/insert";
-            const UPDATE_URL = "/admin/banner/update";
+            const SELECT_API = "/admin/users-feedback/select";
+            const UPDATE_API = "/admin/users-feedback/update";
+            const DELETE_API = "/admin/users-feedback/delete";
+            const INSERT_URL = "/admin/users-feedback/insert";
+            const UPDATE_URL = "/admin/users-feedback/update";
             
             // 字段 创建时间 created_at
             layui.use(["laydate"], function() {
@@ -105,16 +112,31 @@
 					},{
 						title: "主键",align: "center",
 						field: "id",
-					},{
-						title: "图片",align: "center",
-						field: "image",
-						templet: function (d) {
-							return '<img src="'+encodeURI(d['image'])+'" style="max-width:32px;max-height:32px;" alt="" />'
-						}
-					},{
-						title: "权重",align: "center",
-						field: "weigh",
 						sort: true,
+					},{
+						title: "用户",align: "center",
+						field: "user_id",
+                        templet: function (d) {
+                            return d.user? d.user.nickname : "";
+                        }
+					},{
+						title: "常用功能",align: "center",
+						field: "field1",
+					},{
+						title: "满意度",align: "center",
+						field: "field2",
+					},{
+						title: "希望的新功能",align: "center",
+						field: "field3",
+					},{
+						title: "新功能原因",align: "center",
+						field: "field4",
+					},{
+						title: "需要改进的功能",align: "center",
+						field: "field5",
+					},{
+						title: "其他",align: "center",
+						field: "field6",
 					},{
 						title: "创建时间",align: "center",
 						field: "created_at",

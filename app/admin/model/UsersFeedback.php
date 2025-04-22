@@ -6,7 +6,7 @@ namespace app\admin\model;
 use plugin\admin\app\model\Base;
 
 /**
- * 
+ *
  *
  * @property int $id 主键
  * @property int $user_id 用户
@@ -42,5 +42,10 @@ class UsersFeedback extends Base
     protected $fillable = [
         'user_id', 'field1', 'field2', 'field3', 'field4', 'field5', 'field6'
     ];
+
+    function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 
 }

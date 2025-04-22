@@ -4,18 +4,18 @@ namespace app\admin\controller;
 
 use support\Request;
 use support\Response;
-use app\admin\model\Banner;
+use app\admin\model\Advice;
 use plugin\admin\app\controller\Crud;
 use support\exception\BusinessException;
 
 /**
- * 轮播图管理 
+ * 意见反馈 
  */
-class BannerController extends Crud
+class AdviceController extends Crud
 {
     
     /**
-     * @var Banner
+     * @var Advice
      */
     protected $model = null;
 
@@ -25,7 +25,7 @@ class BannerController extends Crud
      */
     public function __construct()
     {
-        $this->model = new Banner;
+        $this->model = new Advice;
     }
     
     /**
@@ -34,7 +34,20 @@ class BannerController extends Crud
      */
     public function index(): Response
     {
-        return view('banner/index');
+        return view('advice/index');
+    }
+
+    /**
+     * 查询
+     * @param Request $request
+     * @return Response
+     * @throws BusinessException
+     */
+    public function select(Request $request): Response
+    {
+        [$where, $format, $limit, $field, $order] = $this->selectInput($request);
+        $query = $this->doSelect($where, $field, $order)->with(['user']);
+        return $this->doFormat($query, $format, $limit);
     }
 
     /**
@@ -48,7 +61,7 @@ class BannerController extends Crud
         if ($request->method() === 'POST') {
             return parent::insert($request);
         }
-        return view('banner/insert');
+        return view('advice/insert');
     }
 
     /**
@@ -62,7 +75,7 @@ class BannerController extends Crud
         if ($request->method() === 'POST') {
             return parent::update($request);
         }
-        return view('banner/update');
+        return view('advice/update');
     }
 
 }

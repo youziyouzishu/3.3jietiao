@@ -23,7 +23,10 @@ class ReceiptController extends Base
     {
         $idcard = $request->post('idcard');
         $truename = $request->post('truename');
-        $user = User::select(['id', 'nickname'])->where(['idcard' => $idcard, 'truename' => $truename])->first();
+        $user = User::select(['id', 'nickname','truename'])->where(['idcard' => $idcard, 'truename' => $truename])->first();
+        if (empty($user)) {
+            return $this->fail('用户不存在');
+        }
         return $this->success('获取成功', $user);
     }
 

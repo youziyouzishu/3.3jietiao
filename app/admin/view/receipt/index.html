@@ -15,6 +15,15 @@
                 <form class="layui-form top-search-from">
                     
                     <div class="layui-form-item">
+                        <label class="layui-form-label">主键</label>
+                        <div class="layui-input-block">
+                            <input type="number" name="id" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+
+                    
+                    <div class="layui-form-item">
                         <label class="layui-form-label">创建时间</label>
                         <div class="layui-input-block">
                             <div class="layui-input-block" id="created_at">
@@ -51,18 +60,18 @@
 
         <!-- 表格顶部工具栏 -->
         <script type="text/html" id="table-toolbar">
-            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="admin.banner.insert">
+            <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add" permission="admin.receipt.insert">
                 <i class="layui-icon layui-icon-add-1"></i>新增
             </button>
-            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="admin.banner.delete">
+            <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove" permission="admin.receipt.delete">
                 <i class="layui-icon layui-icon-delete"></i>删除
             </button>
         </script>
 
         <!-- 表格行工具栏 -->
         <script type="text/html" id="table-bar">
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="admin.banner.update">编辑</button>
-            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="admin.banner.delete">删除</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="edit" permission="admin.receipt.update">编辑</button>
+            <button class="pear-btn pear-btn-xs tool-btn" lay-event="remove" permission="admin.receipt.delete">删除</button>
         </script>
 
         <script src="/app/admin/component/layui/layui.js?v=2.8.12"></script>
@@ -74,11 +83,11 @@
 
             // 相关常量
             const PRIMARY_KEY = "id";
-            const SELECT_API = "/admin/banner/select";
-            const UPDATE_API = "/admin/banner/update";
-            const DELETE_API = "/admin/banner/delete";
-            const INSERT_URL = "/admin/banner/insert";
-            const UPDATE_URL = "/admin/banner/update";
+            const SELECT_API = "/admin/receipt/select";
+            const UPDATE_API = "/admin/receipt/update";
+            const DELETE_API = "/admin/receipt/delete";
+            const INSERT_URL = "/admin/receipt/insert";
+            const UPDATE_URL = "/admin/receipt/update";
             
             // 字段 创建时间 created_at
             layui.use(["laydate"], function() {
@@ -105,17 +114,155 @@
 					},{
 						title: "主键",align: "center",
 						field: "id",
-					},{
-						title: "图片",align: "center",
-						field: "image",
-						templet: function (d) {
-							return '<img src="'+encodeURI(d['image'])+'" style="max-width:32px;max-height:32px;" alt="" />'
-						}
-					},{
-						title: "权重",align: "center",
-						field: "weigh",
 						sort: true,
 					},{
+						title: "出借人",align: "center",
+						field: "user_id",
+						templet: function (d) {
+							return d.user? d.user.nickname : "";
+						}
+					},{
+						title: "借款方",align: "center",
+						field: "to_user_id",
+						templet: function (d) {
+                            return d.to_user? d.to_user.nickname : "";
+						}
+					},{
+						title: "欠款金额",align: "center",
+						field: "amount",
+					},{
+						title: "年化利率",align: "center",
+						field: "rate",
+					},{
+						title: "起始日期",align: "center",
+						field: "start_date",
+					},{
+						title: "还款日期",align: "center",
+						field: "end_date",
+					},{
+						title: "欠款原因",align: "center",
+						field: "reason",
+					},{
+						title: "原因详情",align: "center",
+						field: "mark",
+					},{
+						title: "状态",align: "center",
+						field: "status",
+						templet: function (d) {
+							let field = "status";
+							if (typeof d[field] == "undefined") return "";
+							let items = [];
+							layui.each((d[field] + "").split(","), function (k , v) {
+								items.push(apiResults[field][v] || v);
+							});
+							return util.escape(items.join(","));
+						}
+					},{
+						title: "订单编号",align: "center",
+						field: "ordersn",
+					},{
+						title: "支付金额",align: "center",
+						field: "pay_amount",
+					},{
+						title: "支付类型",align: "center",
+						field: "pay_type",
+						templet: function (d) {
+							let field = "pay_type";
+							if (typeof d[field] == "undefined") return "";
+							let items = [];
+							layui.each((d[field] + "").split(","), function (k , v) {
+								items.push(apiResults[field][v] || v);
+							});
+							return util.escape(items.join(","));
+						}
+					},{
+						title: "条款协议",align: "center",
+						field: "clause_rule",
+						templet: function (d) {
+							return '<a href="' + encodeURI(d['clause_rule']) + '" target="_blank">' + util.escape(d['clause_rule']) + '</a>';
+						}
+					},{
+						title: "借款协议",align: "center",
+						field: "borrow_rule",
+						templet: function (d) {
+							return '<a href="' + encodeURI(d['borrow_rule']) + '" target="_blank">' + util.escape(d['borrow_rule']) + '</a>';
+						}
+					},{
+						title: "授权协议",align: "center",
+						field: "cert_rule",
+						templet: function (d) {
+							return '<a href="' + encodeURI(d['cert_rule']) + '" target="_blank">' + util.escape(d['cert_rule']) + '</a>';
+						}
+					},{
+						title: "支付时间",align: "center",
+						field: "pay_time",
+					},{
+						title: "签名",align: "center",
+						field: "sign",
+						templet: function (d) {
+							return '<img src="'+encodeURI(d['sign'])+'" style="max-width:32px;max-height:32px;" alt="" />'
+						}
+					},{
+						title: "条款协议图片",align: "center",
+						field: "clause_images",		                templet: function (d) {
+                                            let html = '';
+                                            if (d['clause_images']){
+                                                const images = d['clause_images'].split(',');
+
+
+                                                for (let img of images) {
+                                                    html += '<img src="' + encodeURI(img.trim()) + '" style="max-width:32px;max-height:32px;" alt="" />';
+                                                }
+
+                                            }
+                                            return html;
+										}
+					},{
+						title: "授权协议图片",align: "center",
+						field: "cert_images",		                templet: function (d) {
+                            let html = '';
+                            if (d['cert_images']){
+                                const images = d['cert_images'].split(',');
+
+
+                                for (let img of images) {
+                                    html += '<img src="' + encodeURI(img.trim()) + '" style="max-width:32px;max-height:32px;" alt="" />';
+                                }
+
+                            }
+                            return html;
+                        }
+					},{
+						title: "借款协议图片",align: "center",
+						field: "borrow_images",		                templet: function (d) {
+                            let html = '';
+                            if (d['borrow_images']){
+                                const images = d['borrow_images'].split(',');
+
+
+                                for (let img of images) {
+                                    html += '<img src="' + encodeURI(img.trim()) + '" style="max-width:32px;max-height:32px;" alt="" />';
+                                }
+
+                            }
+                            return html;
+                        }
+					},{
+						title: "利息",align: "center",
+						field: "interest",
+					},{
+						title: "本息",align: "center",
+						field: "amount_and_interest",
+					},{
+						title: "已还金额",align: "center",
+						field: "repaid_amount",
+					},{
+						title: "待还金额",align: "center",
+						field: "outstanding_amount",
+					},{
+                        title: "取消时间",align: "center",
+                        field: "cancel_time",
+                    },{
 						title: "创建时间",align: "center",
 						field: "created_at",
 						sort: true,
@@ -139,6 +286,7 @@
 				    cols: [cols],
 				    skin: "line",
 				    size: "lg",
+                    cellMinWidth:120,
 				    toolbar: "#table-toolbar",
 				    autoSort: false,
 				    defaultToolbar: [{
@@ -151,7 +299,13 @@
 				    }
 				});
 				
-				
+				// 获取表格中下拉或树形组件数据
+				let apiResults = {};
+				apiResults["user_id"] = [];
+				apiResults["to_user_id"] = [];
+				apiResults["repayment_type"] = {"1":"一次性还本付息","2":"分期还款"};
+				apiResults["status"] = ["待确认","待还款","已逾期","已还款","已失效"];
+				apiResults["pay_type"] = ["无","微信"];
                 // 编辑或删除行事件
                 table.on("tool(data-table)", function(obj) {
                     if (obj.event === "remove") {

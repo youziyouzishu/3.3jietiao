@@ -12,6 +12,7 @@ use setasign\Fpdi\Tfpdf\Fpdi;
 
 use Spatie\PdfToImage\Pdf;
 use support\Request;
+use support\Response;
 use Webman\RedisQueue\Client;
 
 class IndexController extends Base
@@ -21,7 +22,7 @@ class IndexController extends Base
 
     function index(Request $request)
     {
-
+        return new Response(200,[],"<comment>Ctrl+D</comment>");
     }
 
     function shouquan(Request $request)

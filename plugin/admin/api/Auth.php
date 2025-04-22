@@ -62,7 +62,6 @@ class Auth
             $code = 401;
             return false;
         }
-
         // 不需要鉴权
         if (in_array($action, $noNeedAuth)) {
             return true;
@@ -90,7 +89,6 @@ class Auth
             $code = 2;
             return false;
         }
-
         // 超级管理员
         if (in_array('*', $rule_ids)){
             return true;

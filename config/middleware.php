@@ -12,6 +12,7 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+
 return [
     'api' => [
         \app\middleware\ApiAuth::class,

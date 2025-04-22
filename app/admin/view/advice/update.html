@@ -16,23 +16,60 @@
                 <div class="main-container mr-5">
                     
                     <div class="layui-form-item">
-                        <label class="layui-form-label">图片</label>
+                        <label class="layui-form-label">用户</label>
                         <div class="layui-input-block">
-                            <img class="img-3" src=""/>
-                            <input type="text" style="display:none" name="image" value="" />
-                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="image"  permission="app.admin.upload.image">
-                                <i class="layui-icon layui-icon-upload"></i>上传图片
-                            </button>
-                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-image"  permission="app.admin.upload.attachment">
-                                <i class="layui-icon layui-icon-align-left"></i>选择图片
-                            </button>
+                            <input type="number" name="user_id" value="" class="layui-input">
                         </div>
                     </div>
                     
                     <div class="layui-form-item">
-                        <label class="layui-form-label">权重</label>
+                        <label class="layui-form-label">分类名称</label>
                         <div class="layui-input-block">
-                            <input type="number" name="weigh" value="" class="layui-input">
+                            <input type="text" name="class_name" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">内容</label>
+                        <div class="layui-input-block">
+                            <textarea name="content" required lay-verify="required" class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">图片</label>
+                        <div class="layui-input-block">
+                        
+                            <div class="layui-upload">
+                               <input type="text" class="uploader-list" style="display:none" name="images" value="" id="images"/>
+                               <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                                   预览图：
+                                   <div class="layui-upload-list uploader-list" style="overflow: auto;" id="uploader-list-images">
+                                   </div>
+                               </blockquote>
+                    
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="multi-upload-images" permission="app.admin.upload.image">
+                                   <i class="layui-icon layui-icon-upload"></i>多图上传
+                               </button>
+                               
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-images"  permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择图片
+                              </button>
+                           </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="truename" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">电话</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="mobile" value="" class="layui-input">
                         </div>
                     </div>
                     
@@ -61,8 +98,8 @@
 
             // 相关接口
             const PRIMARY_KEY = "id";
-            const SELECT_API = "/admin/banner/select" + location.search;
-            const UPDATE_API = "/admin/banner/update";
+            const SELECT_API = "/admin/advice/select" + location.search;
+            const UPDATE_API = "/admin/advice/update";
             // 获取数据库记录
             layui.use(["form", "util", "popup"], function () {
                 let $ = layui.$;
@@ -100,11 +137,14 @@
                             }
                         });
                         
-                        // 字段 图片 image
+                        // 字段 图片 images
                         layui.use(["upload", "layer"], function() {
-                            let input = layui.$("#image").prev();
-                            input.prev().attr("src", input.val());
-                            layui.$("#attachment-choose-image").on("click", function() {
+                            var upload = layui.upload;
+                            var $ = layui.$;
+                            let multiple_images = layui.$("#images").attr("value").split(",");
+                            
+                            
+                            $("#attachment-choose-images").on("click", function() {
                                 parent.layer.open({
                                     type: 2,
                                     title: "选择附件",
@@ -112,22 +152,78 @@
                                     area: ["95%", "90%"],
                                     success: function (layero, index) {
                                         parent.layui.$("#layui-layer" + index).data("callback", function (data) {
-                                            input.val(data.url).prev().attr("src", data.url);
+                                                    //上传完毕
+                               $('#uploader-list-images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ data.url +' alt="'+ data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(data.url);
+                               $('#images').val(multiple_images);
                                         });
                                     }
                                 });
                             });
-                            layui.upload.render({
-                                elem: "#image",
-                                multiple: 0,
+                            
+                            upload.render({
+                                elem: '#multi-upload-images',
+                                multiple: 1,
                                 acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
                                 url: "/app/admin/upload/image",
                                 field: "__file__",
-                                done: function (res) {
-                                    if (res.code > 0) return layui.layer.msg(res.msg);
-                                    this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
-                                }
-                            });
+                                before: function(obj){
+                               layer.msg('图片上传中...', {
+                                   icon: 16,
+                                   shade: 0.01,
+                                   time: 0
+                               })
+                           },
+                           done: function(res){
+                               layer.close(layer.msg());//关闭上传提示窗口
+                               //上传完毕
+                               $('#uploader-list-images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ res.data.url +' alt="'+ res.data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(res.data.url);
+                               $('#images').val(multiple_images);
+                           }
+                        });
+                        
+                        //鼠标悬浮事件
+                        $(document).on("mouseenter mouseleave", ".file-iteme", function(event){
+                           if(event.type === "mouseenter"){
+                               //鼠标悬浮
+                               $(this).children(".info").fadeIn("fast");
+                               $(this).children(".handle").fadeIn("fast");
+                           }else if(event.type === "mouseleave") {
+                               //鼠标离开
+                               $(this).children(".info").hide();
+                               $(this).children(".handle").hide();
+                           }
+                        });
+                        
+                        // 删除图片
+                        $(document).on("click", ".file-iteme .handle", function(event){
+                           var delImg = $(this).parent().children("img").attr("src")
+                           var index = multiple_images.indexOf(delImg);
+                           if (index !== -1) {
+                               multiple_images.splice(index, 1);
+                           }
+                           //重新赋值
+                           $('#images').val(multiple_images);
+                           //删除标签
+                           $(this).parent().remove();
+                        });
+                        //多图上传 end
+                        
                         });
                         
                         

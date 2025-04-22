@@ -73,10 +73,10 @@ class Receipt extends Base
     protected $primaryKey = 'id';
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'pay_time' => 'datetime',
-        'cancel_time' => 'datetime',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
+        'pay_time' => 'datetime:Y-m-d H:i:s',
+        'cancel_time' => 'datetime:Y-m-d H:i:s',
     ];
 
     protected $fillable = [
@@ -110,6 +110,7 @@ class Receipt extends Base
         'amount_and_interest',
         'repaid_amount',
         'outstanding_amount',
+        'cancel_time',
     ];
 
     protected $appends = [

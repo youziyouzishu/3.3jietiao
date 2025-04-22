@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head>
+        <meta charset="UTF-8">
+        <title>更新页面</title>
+        <link rel="stylesheet" href="/app/admin/component/pear/css/pear.css" />
+        <link rel="stylesheet" href="/app/admin/component/jsoneditor/css/jsoneditor.css" />
+        <link rel="stylesheet" href="/app/admin/admin/css/reset.css" />
+        
+    </head>
+    <body>
+
+        <form class="layui-form">
+
+            <div class="mainBox">
+                <div class="main-container mr-5">
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">出借人</label>
+                        <div class="layui-input-block">
+                            <div name="user_id" id="user_id" required value="" ></div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">借款方</label>
+                        <div class="layui-input-block">
+                            <div name="to_user_id" id="to_user_id" required value="" ></div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">欠款金额</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="amount" value="" required lay-verify="required" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label required">年化利率</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="rate" value="" required lay-verify="required" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">起始日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="start_date" id="start_date" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">还款日期</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="end_date" id="end_date" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">欠款原因</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="reason" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">原因详情</label>
+                        <div class="layui-input-block">
+                            <textarea name="mark" class="layui-textarea"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">状态:0=待确认,1=待还款,2=已逾期,3=已还款,4=已失效</label>
+                        <div class="layui-input-block">
+                            <div name="status" id="status" value="" ></div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">订单编号</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="ordersn" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支付金额</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="pay_amount" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支付类型:0=无,1=微信</label>
+                        <div class="layui-input-block">
+                            <div name="pay_type" id="pay_type" value="" ></div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">条款协议</label>
+                        <div class="layui-input-block">
+                            <span></span>
+                            <input type="text" style="display:none" name="clause_rule" value="" />
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="clause_rule" permission="app.admin.upload.file">
+                                <i class="layui-icon layui-icon-upload"></i>上传文件
+                            </button>
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-clause_rule" permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择文件
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">借款协议</label>
+                        <div class="layui-input-block">
+                            <span></span>
+                            <input type="text" style="display:none" name="borrow_rule" value="" />
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="borrow_rule" permission="app.admin.upload.file">
+                                <i class="layui-icon layui-icon-upload"></i>上传文件
+                            </button>
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-borrow_rule" permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择文件
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">授权协议</label>
+                        <div class="layui-input-block">
+                            <span></span>
+                            <input type="text" style="display:none" name="cert_rule" value="" />
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="cert_rule" permission="app.admin.upload.file">
+                                <i class="layui-icon layui-icon-upload"></i>上传文件
+                            </button>
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-cert_rule" permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择文件
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">支付时间</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="pay_time" id="pay_time" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">签名</label>
+                        <div class="layui-input-block">
+                            <img class="img-3" src=""/>
+                            <input type="text" style="display:none" name="sign" value="" />
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="sign"  permission="app.admin.upload.image">
+                                <i class="layui-icon layui-icon-upload"></i>上传图片
+                            </button>
+                            <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-sign"  permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择图片
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">条款协议图片</label>
+                        <div class="layui-input-block">
+                        
+                            <div class="layui-upload">
+                               <input type="text" class="uploader-list" style="display:none" name="clause_images" value="" id="clause_images"/>
+                               <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                                   预览图：
+                                   <div class="layui-upload-list uploader-list" style="overflow: auto;" id="uploader-list-clause_images">
+                                   </div>
+                               </blockquote>
+                    
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="multi-upload-clause_images" permission="app.admin.upload.image">
+                                   <i class="layui-icon layui-icon-upload"></i>多图上传
+                               </button>
+                               
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-clause_images"  permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择图片
+                              </button>
+                           </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">授权协议图片</label>
+                        <div class="layui-input-block">
+                        
+                            <div class="layui-upload">
+                               <input type="text" class="uploader-list" style="display:none" name="cert_images" value="" id="cert_images"/>
+                               <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                                   预览图：
+                                   <div class="layui-upload-list uploader-list" style="overflow: auto;" id="uploader-list-cert_images">
+                                   </div>
+                               </blockquote>
+                    
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="multi-upload-cert_images" permission="app.admin.upload.image">
+                                   <i class="layui-icon layui-icon-upload"></i>多图上传
+                               </button>
+                               
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-cert_images"  permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择图片
+                              </button>
+                           </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">借款协议图片</label>
+                        <div class="layui-input-block">
+                        
+                            <div class="layui-upload">
+                               <input type="text" class="uploader-list" style="display:none" name="borrow_images" value="" id="borrow_images"/>
+                               <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">
+                                   预览图：
+                                   <div class="layui-upload-list uploader-list" style="overflow: auto;" id="uploader-list-borrow_images">
+                                   </div>
+                               </blockquote>
+                    
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="multi-upload-borrow_images" permission="app.admin.upload.image">
+                                   <i class="layui-icon layui-icon-upload"></i>多图上传
+                               </button>
+                               
+                               <button type="button" class="pear-btn pear-btn-primary pear-btn-sm" id="attachment-choose-borrow_images"  permission="app.admin.upload.attachment">
+                                <i class="layui-icon layui-icon-align-left"></i>选择图片
+                              </button>
+                           </div>
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">利息</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="interest" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">本息</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="amount_and_interest" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">已还金额</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="repaid_amount" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">待还金额</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="outstanding_amount" value="" class="layui-input">
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <div class="bottom">
+                <div class="button-container">
+                    <button type="submit" class="pear-btn pear-btn-primary pear-btn-md" lay-submit="" lay-filter="save">
+                        提交
+                    </button>
+                    <button type="reset" class="pear-btn pear-btn-md">
+                        重置
+                    </button>
+                </div>
+            </div>
+            
+        </form>
+
+        <script src="/app/admin/component/layui/layui.js?v=2.8.12"></script>
+        <script src="/app/admin/component/pear/pear.js"></script>
+        <script src="/app/admin/component/jsoneditor/jsoneditor.js"></script>
+        <script src="/app/admin/admin/js/permission.js"></script>
+        
+        <script>
+
+            // 相关接口
+            const PRIMARY_KEY = "id";
+            const SELECT_API = "/admin/receipt/select" + location.search;
+            const UPDATE_API = "/admin/receipt/update";
+            // 获取数据库记录
+            layui.use(["form", "util", "popup"], function () {
+                let $ = layui.$;
+                $.ajax({
+                    url: SELECT_API,
+                    dataType: "json",
+                    success: function (res) {
+                        
+                        // 给表单初始化数据
+                        layui.each(res.data[0], function (key, value) {
+                            let obj = $('*[name="'+key+'"]');
+                            if (key === "password") {
+                                obj.attr("placeholder", "不更新密码请留空");
+                                return;
+                            }
+                            if (typeof obj[0] === "undefined" || !obj[0].nodeName) return;
+                            if (obj[0].nodeName.toLowerCase() === "textarea") {
+                                obj.val(value);
+                            } else {
+                                obj.attr("value", value);
+                                obj[0].value = value;
+                            }
+                            
+                            // 多图渲染
+                            if (obj[0].classList.contains('uploader-list')) {
+                                let multiple_images = value.split(",");
+                                $.each(multiple_images, function(index, value) {
+                                    $('#uploader-list-'+ key).append(
+                                        '<div class="file-iteme">' +
+                                        '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                        '<img src='+value +' alt="'+ value +'" >' +
+                                        '</div>'
+                                    );
+                                });
+                            }
+                        });
+                        
+                        // 字段 出借人 user_id
+                        layui.use(["jquery", "xmSelect"], function() {
+                            let value = layui.$("#user_id").attr("value");
+                            let initValue = value ? value.split(",") : [];
+                            layui.xmSelect.render({
+                                el: "#user_id",
+                                name: "user_id",
+                                filterable: true,
+                                initValue: initValue,
+                                model: {"icon":"hidden","label":{"type":"text"}},
+                                clickClose: true,
+                                radio: true,
+                                layVerify: "required",
+                            })
+                        });
+                        
+                        // 字段 借款方 to_user_id
+                        layui.use(["jquery", "xmSelect"], function() {
+                            let value = layui.$("#to_user_id").attr("value");
+                            let initValue = value ? value.split(",") : [];
+                            layui.xmSelect.render({
+                                el: "#to_user_id",
+                                name: "to_user_id",
+                                filterable: true,
+                                initValue: initValue,
+                                model: {"icon":"hidden","label":{"type":"text"}},
+                                clickClose: true,
+                                radio: true,
+                                layVerify: "required",
+                            })
+                        });
+                        
+                        // 字段 起始日期 start_date
+                        layui.use(["laydate"], function() {
+                            layui.laydate.render({
+                                elem: "#start_date",
+                        
+                            });
+                        })
+                        
+                        // 字段 还款日期 end_date
+                        layui.use(["laydate"], function() {
+                            layui.laydate.render({
+                                elem: "#end_date",
+                        
+                            });
+                        })
+                        
+                        // 字段 状态:0=待确认,1=待还款,2=已逾期,3=已还款,4=已失效 status
+                        layui.use(["jquery", "xmSelect"], function() {
+                            let value = layui.$("#status").attr("value");
+                            let initValue = value ? value.split(",") : [];
+                            layui.xmSelect.render({
+                                el: "#status",
+                                name: "status",
+                                filterable: true,
+                                initValue: initValue,
+                                data: [{"value":"0","name":"待确认"},{"value":"1","name":"待还款"},{"value":"2","name":"已逾期"},{"value":"3","name":"已还款"},{"value":"4","name":"已失效"}],
+                                model: {"icon":"hidden","label":{"type":"text"}},
+                                clickClose: true,
+                                radio: true,
+                            })
+                        });
+                        
+                        // 字段 支付类型:0=无,1=微信 pay_type
+                        layui.use(["jquery", "xmSelect"], function() {
+                            let value = layui.$("#pay_type").attr("value");
+                            let initValue = value ? value.split(",") : [];
+                            layui.xmSelect.render({
+                                el: "#pay_type",
+                                name: "pay_type",
+                                filterable: true,
+                                initValue: initValue,
+                                data: [{"value":"0","name":"无"},{"value":"1","name":"微信"}],
+                                model: {"icon":"hidden","label":{"type":"text"}},
+                                clickClose: true,
+                                radio: true,
+                            })
+                        });
+                        
+                        // 字段 条款协议 clause_rule
+                        layui.use(["upload", "layer", "popup", "util"], function() {
+                            let input = layui.$("#clause_rule").prev();
+                            input.prev().html(layui.util.escape(input.val()));
+                            layui.$("#attachment-choose-clause_rule").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                            input.val(data.url).prev().html(layui.util.escape(data.url));
+                                        });
+                                    }
+                                });
+                            });
+                            layui.upload.render({
+                                elem: "#clause_rule",
+                                accept: "file",
+                                url: "/app/admin/upload/file",
+                                field: "__file__",
+                                done: function (res) {
+                                    if (res.code) return layui.popup.failure(res.msg);
+                                    this.item.prev().val(res.data.url).prev().html(layui.util.escape(res.data.url));
+                                }
+                            });
+                        });
+                        
+                        // 字段 借款协议 borrow_rule
+                        layui.use(["upload", "layer", "popup", "util"], function() {
+                            let input = layui.$("#borrow_rule").prev();
+                            input.prev().html(layui.util.escape(input.val()));
+                            layui.$("#attachment-choose-borrow_rule").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                            input.val(data.url).prev().html(layui.util.escape(data.url));
+                                        });
+                                    }
+                                });
+                            });
+                            layui.upload.render({
+                                elem: "#borrow_rule",
+                                accept: "file",
+                                url: "/app/admin/upload/file",
+                                field: "__file__",
+                                done: function (res) {
+                                    if (res.code) return layui.popup.failure(res.msg);
+                                    this.item.prev().val(res.data.url).prev().html(layui.util.escape(res.data.url));
+                                }
+                            });
+                        });
+                        
+                        // 字段 授权协议 cert_rule
+                        layui.use(["upload", "layer", "popup", "util"], function() {
+                            let input = layui.$("#cert_rule").prev();
+                            input.prev().html(layui.util.escape(input.val()));
+                            layui.$("#attachment-choose-cert_rule").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                            input.val(data.url).prev().html(layui.util.escape(data.url));
+                                        });
+                                    }
+                                });
+                            });
+                            layui.upload.render({
+                                elem: "#cert_rule",
+                                accept: "file",
+                                url: "/app/admin/upload/file",
+                                field: "__file__",
+                                done: function (res) {
+                                    if (res.code) return layui.popup.failure(res.msg);
+                                    this.item.prev().val(res.data.url).prev().html(layui.util.escape(res.data.url));
+                                }
+                            });
+                        });
+                        
+                        // 字段 支付时间 pay_time
+                        layui.use(["laydate"], function() {
+                            layui.laydate.render({
+                                elem: "#pay_time",
+                                type: "datetime",
+                            });
+                        })
+                        
+                        // 字段 签名 sign
+                        layui.use(["upload", "layer"], function() {
+                            let input = layui.$("#sign").prev();
+                            input.prev().attr("src", input.val());
+                            layui.$("#attachment-choose-sign").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                            input.val(data.url).prev().attr("src", data.url);
+                                        });
+                                    }
+                                });
+                            });
+                            layui.upload.render({
+                                elem: "#sign",
+                                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                url: "/app/admin/upload/image",
+                                multiple: 0,
+                                field: "__file__",
+                                done: function (res) {
+                                    if (res.code > 0) return layui.layer.msg(res.msg);
+                                    this.item.prev().val(res.data.url).prev().attr("src", res.data.url);
+                                }
+                            });
+                        });
+                        
+                        // 字段 条款协议图片 clause_images
+                        layui.use(["upload", "layer"], function() {
+                            var upload = layui.upload;
+                            var $ = layui.$;
+                            let multiple_images = layui.$("#clause_images").attr("value").split(",");
+                            
+                            
+                            $("#attachment-choose-clause_images").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                                    //上传完毕
+                               $('#uploader-list-clause_images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ data.url +' alt="'+ data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(data.url);
+                               $('#clause_images').val(multiple_images);
+                                        });
+                                    }
+                                });
+                            });
+                            
+                            upload.render({
+                                elem: '#multi-upload-clause_images',
+                                multiple: 1,
+                                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                url: "/app/admin/upload/image",
+                                field: "__file__",
+                                before: function(obj){
+                               layer.msg('图片上传中...', {
+                                   icon: 16,
+                                   shade: 0.01,
+                                   time: 0
+                               })
+                           },
+                           done: function(res){
+                               layer.close(layer.msg());//关闭上传提示窗口
+                               //上传完毕
+                               $('#uploader-list-clause_images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ res.data.url +' alt="'+ res.data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(res.data.url);
+                               $('#clause_images').val(multiple_images);
+                           }
+                        });
+                        
+                        //鼠标悬浮事件
+                        $(document).on("mouseenter mouseleave", ".file-iteme", function(event){
+                           if(event.type === "mouseenter"){
+                               //鼠标悬浮
+                               $(this).children(".info").fadeIn("fast");
+                               $(this).children(".handle").fadeIn("fast");
+                           }else if(event.type === "mouseleave") {
+                               //鼠标离开
+                               $(this).children(".info").hide();
+                               $(this).children(".handle").hide();
+                           }
+                        });
+                        
+                        // 删除图片
+                        $(document).on("click", ".file-iteme .handle", function(event){
+                           var delImg = $(this).parent().children("img").attr("src")
+                           var index = multiple_images.indexOf(delImg);
+                           if (index !== -1) {
+                               multiple_images.splice(index, 1);
+                           }
+                           //重新赋值
+                           $('#clause_images').val(multiple_images);
+                           //删除标签
+                           $(this).parent().remove();
+                        });
+                        //多图上传 end
+                        
+                        });
+                        
+                        // 字段 授权协议图片 cert_images
+                        layui.use(["upload", "layer"], function() {
+                            var upload = layui.upload;
+                            var $ = layui.$;
+                            let multiple_images = layui.$("#cert_images").attr("value").split(",");
+                            
+                            
+                            $("#attachment-choose-cert_images").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                                    //上传完毕
+                               $('#uploader-list-cert_images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ data.url +' alt="'+ data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(data.url);
+                               $('#cert_images').val(multiple_images);
+                                        });
+                                    }
+                                });
+                            });
+                            
+                            upload.render({
+                                elem: '#multi-upload-cert_images',
+                                multiple: 1,
+                                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                url: "/app/admin/upload/image",
+                                field: "__file__",
+                                before: function(obj){
+                               layer.msg('图片上传中...', {
+                                   icon: 16,
+                                   shade: 0.01,
+                                   time: 0
+                               })
+                           },
+                           done: function(res){
+                               layer.close(layer.msg());//关闭上传提示窗口
+                               //上传完毕
+                               $('#uploader-list-cert_images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ res.data.url +' alt="'+ res.data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(res.data.url);
+                               $('#cert_images').val(multiple_images);
+                           }
+                        });
+                        
+                        //鼠标悬浮事件
+                        $(document).on("mouseenter mouseleave", ".file-iteme", function(event){
+                           if(event.type === "mouseenter"){
+                               //鼠标悬浮
+                               $(this).children(".info").fadeIn("fast");
+                               $(this).children(".handle").fadeIn("fast");
+                           }else if(event.type === "mouseleave") {
+                               //鼠标离开
+                               $(this).children(".info").hide();
+                               $(this).children(".handle").hide();
+                           }
+                        });
+                        
+                        // 删除图片
+                        $(document).on("click", ".file-iteme .handle", function(event){
+                           var delImg = $(this).parent().children("img").attr("src")
+                           var index = multiple_images.indexOf(delImg);
+                           if (index !== -1) {
+                               multiple_images.splice(index, 1);
+                           }
+                           //重新赋值
+                           $('#cert_images').val(multiple_images);
+                           //删除标签
+                           $(this).parent().remove();
+                        });
+                        //多图上传 end
+                        
+                        });
+                        
+                        // 字段 借款协议图片 borrow_images
+                        layui.use(["upload", "layer"], function() {
+                            var upload = layui.upload;
+                            var $ = layui.$;
+                            let multiple_images = layui.$("#borrow_images").attr("value").split(",");
+                            
+                            
+                            $("#attachment-choose-borrow_images").on("click", function() {
+                                parent.layer.open({
+                                    type: 2,
+                                    title: "选择附件",
+                                    content: "/app/admin/upload/attachment?ext=jpg,jpeg,png,gif,bmp",
+                                    area: ["95%", "90%"],
+                                    success: function (layero, index) {
+                                        parent.layui.$("#layui-layer" + index).data("callback", function (data) {
+                                                    //上传完毕
+                               $('#uploader-list-borrow_images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ data.url +' alt="'+ data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(data.url);
+                               $('#borrow_images').val(multiple_images);
+                                        });
+                                    }
+                                });
+                            });
+                            
+                            upload.render({
+                                elem: '#multi-upload-borrow_images',
+                                multiple: 1,
+                                acceptMime: "image/gif,image/jpeg,image/jpg,image/png",
+                                url: "/app/admin/upload/image",
+                                field: "__file__",
+                                before: function(obj){
+                               layer.msg('图片上传中...', {
+                                   icon: 16,
+                                   shade: 0.01,
+                                   time: 0
+                               })
+                           },
+                           done: function(res){
+                               layer.close(layer.msg());//关闭上传提示窗口
+                               //上传完毕
+                               $('#uploader-list-borrow_images').append(
+                                   '<div class="file-iteme">' +
+                                   '<div class="handle"><i class="layui-icon layui-icon-delete"></i></div>' +
+                                   '<img src='+ res.data.url +' alt="'+ res.data.name +'" >' +
+                                   '</div>'
+                               );
+                        
+                               //追加图片成功追加文件名至图片容器
+                               multiple_images.push(res.data.url);
+                               $('#borrow_images').val(multiple_images);
+                           }
+                        });
+                        
+                        //鼠标悬浮事件
+                        $(document).on("mouseenter mouseleave", ".file-iteme", function(event){
+                           if(event.type === "mouseenter"){
+                               //鼠标悬浮
+                               $(this).children(".info").fadeIn("fast");
+                               $(this).children(".handle").fadeIn("fast");
+                           }else if(event.type === "mouseleave") {
+                               //鼠标离开
+                               $(this).children(".info").hide();
+                               $(this).children(".handle").hide();
+                           }
+                        });
+                        
+                        // 删除图片
+                        $(document).on("click", ".file-iteme .handle", function(event){
+                           var delImg = $(this).parent().children("img").attr("src")
+                           var index = multiple_images.indexOf(delImg);
+                           if (index !== -1) {
+                               multiple_images.splice(index, 1);
+                           }
+                           //重新赋值
+                           $('#borrow_images').val(multiple_images);
+                           //删除标签
+                           $(this).parent().remove();
+                        });
+                        //多图上传 end
+                        
+                        });
+                        
+                        
+                        // ajax返回失败
+                        if (res.code) {
+                            layui.popup.failure(res.msg);
+                        }
+                        
+                    }
+                });
+            });
+
+            //提交事件
+            layui.use(["form", "popup"], function () {
+                // 字段验证允许为空
+                layui.form.verify({
+                    phone: [/(^$)|^1\d{10}$/, "请输入正确的手机号"],
+                    email: [/(^$)|^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/, "邮箱格式不正确"],
+                    url: [/(^$)|(^#)|(^http(s*):\/\/[^\s]+\.[^\s]+)/, "链接格式不正确"],
+                    number: [/(^$)|^\d+$/,'只能填写数字'],
+                    date: [/(^$)|^(\d{4})[-\/](\d{1}|0\d{1}|1[0-2])([-\/](\d{1}|0\d{1}|[1-2][0-9]|3[0-1]))*$/, "日期格式不正确"],
+                    identity: [/(^$)|(^\d{15}$)|(^\d{17}(x|X|\d)$)/, "请输入正确的身份证号"]
+                });
+                layui.form.on("submit(save)", function (data) {
+                    data.field[PRIMARY_KEY] = layui.url().search[PRIMARY_KEY];
+                    layui.$.ajax({
+                        url: UPDATE_API,
+                        type: "POST",
+                        dateType: "json",
+                        data: data.field,
+                        success: function (res) {
+                            if (res.code) {
+                                return layui.popup.failure(res.msg);
+                            }
+                            return layui.popup.success("操作成功", function () {
+                                parent.refreshTable();
+                                parent.layer.close(parent.layer.getFrameIndex(window.name));
+                            });
+                        }
+                    });
+                    return false;
+                });
+            });
+
+        </script>
+
+    </body>
+
+</html>
