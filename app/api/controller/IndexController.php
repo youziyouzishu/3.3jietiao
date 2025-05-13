@@ -7,6 +7,8 @@ use app\api\basic\Base;
 
 
 use Carbon\Carbon;
+use Rtgm\sm\RtSm2;
+use Rtgm\sm\RtSm4;
 use setasign\Fpdi\PdfReader\PdfReaderException;
 use setasign\Fpdi\Tfpdf\Fpdi;
 
@@ -22,7 +24,10 @@ class IndexController extends Base
 
     function index(Request $request)
     {
-        return new Response(200,[],"<comment>Ctrl+D</comment>");
+        $receipts = Receipt::whereNull('cert_rule')->get()->each(function ($receipt) {
+            Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
+        });
+
     }
 
     function shouquan(Request $request)

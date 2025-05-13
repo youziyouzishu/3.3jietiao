@@ -3,26 +3,18 @@
 namespace app\api\controller;
 
 use app\admin\model\Advice;
-use app\admin\model\EidToken;
 use app\admin\model\Receipt;
 use app\admin\model\Sms;
 use app\admin\model\User;
 use app\admin\model\UsersScoreLog;
 use app\admin\model\UsersWithdraw;
 use app\api\basic\Base;
-use app\api\service\Pay;
 use Carbon\Carbon;
-use EasyWeChat\OpenPlatform\Application;
+use EasyWeChat\MiniApp\Application;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 use plugin\admin\app\common\Util;
 use plugin\admin\app\model\Option;
 use support\Request;
-use TencentCloud\Common\Credential;
-use TencentCloud\Common\Profile\ClientProfile;
-use TencentCloud\Common\Profile\HttpProfile;
-use TencentCloud\Faceid\V20180301\FaceidClient;
-use TencentCloud\Faceid\V20180301\Models\GetEidTokenRequest;
 
 class UserController extends Base
 {
@@ -163,16 +155,12 @@ class UserController extends Base
     function bindWechat(Request $request)
     {
         $code = $request->post('code');
-        $config = config('wechat');
+        $config = config('wechat.UserMiniApp');
         $app = new Application($config);
-        $oauth = $app->getOauth();
-        try {
-            $response = $oauth->userFromCode($code);
-        } catch (\Throwable $e) {
-            return $this->fail($e->getMessage());
-        }
+        $ret = $app->getUtils()->codeToSession($code);
+        $openid = $ret['openid'];
         $user = User::find($request->user_id);
-        $user->openid = $response->getId();
+        $user->openid = $openid;
         $user->save();
         return $this->success('绑定成功');
     }

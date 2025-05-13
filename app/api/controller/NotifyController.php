@@ -136,7 +136,6 @@ class NotifyController extends Base
                     $order->pay_time = Carbon::now();
                     $order->pay_type = $paytype;
                     $order->save();
-                    Client::send('job', ['id' => $order->id, 'event' => 'generate_pdf']);
                     break;
                 case 'recharge':
                     $order = RechargeOrders::where(['ordersn' => $out_trade_no, 'status' => 0])->first();

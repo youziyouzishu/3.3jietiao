@@ -153,8 +153,9 @@ class ReceiptController extends Base
                 'repaid_amount' => 0,
                 'outstanding_amount' => $amount_and_interest,
             ]);
-            Client::send('job', ['id' => $receipt->id, 'event' => 'receipt_expire'],60*60*24);
             DB::connection('plugin.admin.mysql')->commit();
+            Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
+            Client::send('job', ['id' => $receipt->id, 'event' => 'receipt_expire'],60*60*24);
         }catch (\Throwable $e){
             DB::connection('plugin.admin.mysql')->rollBack();
             Log::error($e->getMessage());

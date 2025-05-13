@@ -2,14 +2,13 @@
 
 namespace app\api\controller;
 
-use app\admin\model\EidToken;
-use app\admin\model\Sms;
 use app\admin\model\User;
 use app\api\basic\Base;
 use Carbon\Carbon;
 use EasyWeChat\MiniApp\Application;
 use plugin\admin\app\common\Util;
-use support\Log;
+use Rtgm\sm\RtSm2;
+use Rtgm\sm\RtSm4;
 use support\Request;
 use TencentCloud\Common\Credential;
 use TencentCloud\Common\Profile\ClientProfile;
@@ -49,6 +48,8 @@ class AccountController extends Base
         return $this->success('登录成功', ['user' => $user, 'token' => $token]);
     }
 
+
+
     function register(Request $request)
     {
         $truename = $request->post('truename');
@@ -70,15 +71,6 @@ class AccountController extends Base
             return $this->fail('用户已存在');
         }
 
-
-        $eidToken = EidToken::where('token',$eid_token)->first();
-        if(!$eidToken){
-            return $this->fail('人脸核身Token不存在');
-        }
-        if ($eidToken->truename !== $truename || $eidToken->idcard !== $idcard){
-            return $this->fail('身份与核验信息不符');
-        }
-
         $cred = new Credential('AKIDoVGvRlurcAqTXSBj5FDzZyEKH6kCVijY', 'gTF043sX1JPKl6NZaP2a1JXo5OdhbKrC');
         $httpProfile = new HttpProfile();
         $httpProfile->setEndpoint('faceid.tencentcloudapi.com');
@@ -92,6 +84,18 @@ class AccountController extends Base
         $ErrCode = $resp->Text->ErrCode;
         if($ErrCode !== 0){
             return $this->fail('人脸核身失败');
+        }
+
+        $privateKey = '86568be9cd782b9434d744d45ff3acb94532d386e734bf0f449cec8b8160b8f1';
+        $desKey = $resp->EidInfo->DesKey;
+        $userInfo = $resp->EidInfo->UserInfo;
+        $sm2 = new RtSm2();
+        $key = $sm2->doDecrypt(bin2hex(base64_decode($desKey)), $privateKey, $trim = true, $model = C1C3C2);
+        $sm4 = new RtSm4($key);
+        $userInfo = $sm4->decrypt(bin2hex(base64_decode($userInfo)), 'sm4-ecb', '', 'hex');
+        $userInfo = json_decode($userInfo);
+        if ($userInfo->name !== $truename || $userInfo->idnum !== $idcard){
+            return $this->fail('人脸核身信息不匹配');
         }
 
 
@@ -141,14 +145,6 @@ class AccountController extends Base
             return $this->fail('用户不存在');
         }
 
-        $eidToken = EidToken::where('token',$eid_token)->first();
-        if(!$eidToken){
-            return $this->fail('人脸核身Token不存在');
-        }
-        if ($eidToken->truename !== $truename || $eidToken->idcard !== $idcard){
-            return $this->fail('身份与核验信息不符');
-        }
-
         $cred = new Credential('AKIDoVGvRlurcAqTXSBj5FDzZyEKH6kCVijY', 'gTF043sX1JPKl6NZaP2a1JXo5OdhbKrC');
         $httpProfile = new HttpProfile();
         $httpProfile->setEndpoint('faceid.tencentcloudapi.com');
@@ -162,6 +158,18 @@ class AccountController extends Base
         $ErrCode = $resp->Text->ErrCode;
         if($ErrCode !== 0){
             return $this->fail('人脸核身失败');
+        }
+
+        $privateKey = '86568be9cd782b9434d744d45ff3acb94532d386e734bf0f449cec8b8160b8f1';
+        $desKey = $resp->EidInfo->DesKey;
+        $userInfo = $resp->EidInfo->UserInfo;
+        $sm2 = new RtSm2();
+        $key = $sm2->doDecrypt(bin2hex(base64_decode($desKey)), $privateKey, $trim = true, $model = C1C3C2);
+        $sm4 = new RtSm4($key);
+        $userInfo = $sm4->decrypt(bin2hex(base64_decode($userInfo)), 'sm4-ecb', '', 'hex');
+        $userInfo = json_decode($userInfo);
+        if ($userInfo->name !== $truename || $userInfo->idnum !== $idcard){
+            return $this->fail('人脸核身信息不匹配');
         }
 
         $user->trade_password = Util::passwordHash($trade_password);

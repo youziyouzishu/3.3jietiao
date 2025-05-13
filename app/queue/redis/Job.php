@@ -63,8 +63,6 @@ class Job implements Consumer
                 }
                 // 输出 PDF 文件
                 $pdf->Output(public_path("/borrow/$receipt->id.pdf"), 'F'); // 保存为文件
-
-
                 $pdf = new Fpdi();
                 // 导入现有 PDF 文件的第一页
                 $pageCount = $pdf->setSourceFile(public_path('授权确认书.pdf'));
@@ -108,7 +106,6 @@ class Job implements Consumer
                     $borrow_images[] = $tempImagePath;
                     $pdf->selectPage($page)->save(public_path($tempImagePath));
                 }
-
                 $cert_images = [];
                 // 初始化 PDF 对象
                 $pdf = new Pdf(public_path($receipt->cert_rule));
@@ -120,7 +117,6 @@ class Job implements Consumer
                     $cert_images[] = $tempImagePath;
                     $pdf->selectPage($page)->save(public_path($tempImagePath));
                 }
-
                 $clause_images = [];
                 // 初始化 PDF 对象
                 $pdf = new Pdf(public_path($receipt->clause_rule));
