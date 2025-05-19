@@ -4,18 +4,10 @@ namespace app\api\controller;
 
 use app\admin\model\Receipt;
 use app\api\basic\Base;
-
-
-use Carbon\Carbon;
-use Rtgm\sm\RtSm2;
-use Rtgm\sm\RtSm4;
 use setasign\Fpdi\PdfReader\PdfReaderException;
 use setasign\Fpdi\Tfpdf\Fpdi;
-
-use Spatie\PdfToImage\Pdf;
 use support\Request;
-use support\Response;
-use Webman\RedisQueue\Client;
+
 
 class IndexController extends Base
 {
@@ -24,9 +16,9 @@ class IndexController extends Base
 
     function index(Request $request)
     {
-        $receipts = Receipt::whereNull('cert_rule')->get()->each(function ($receipt) {
-            Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
-        });
+//        $receipts = Receipt::all()->each(function ($receipt) {
+//            Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
+//        });
 
     }
 

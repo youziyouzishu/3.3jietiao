@@ -22,7 +22,6 @@ class Job implements Consumer
     {
         try {
             $event = $data['event'];
-            Log::info($event);
             if ($event == 'generate_pdf') {
                 $id = $data['id'];
                 $receipt = Receipt::find($id);
@@ -56,8 +55,8 @@ class Job implements Consumer
                     }
                     if ($i == 4) {
                         $pdf->SetFontSize(10);
-                        $pdf->Text(56, 167, $receipt->user->truename);
-                        $pdf->Text(56, 172, $receipt->toUser->truename);
+                        $pdf->Text(56, 167, $receipt->toUser->truename);
+                        $pdf->Text(56, 172, $receipt->user->truename);
                         $pdf->Text(56, 178, date('Y-m-d'));
                     }
                 }
@@ -144,6 +143,7 @@ class Job implements Consumer
             }
             Log::info('队列成功');
         } catch (\Throwable $e) {
+            Log::info($data);
             Log::info('队列失败');
             Log::info($e->getMessage());
         }

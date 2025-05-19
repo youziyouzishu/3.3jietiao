@@ -23,7 +23,7 @@ class ReceiptController extends Base
     {
         $idcard = $request->post('idcard');
         $truename = $request->post('truename');
-        $user = User::select(['id', 'nickname','truename'])->where(['idcard' => $idcard, 'truename' => $truename])->first();
+        $user = User::select(['id', 'nickname', 'truename'])->where(['idcard' => $idcard, 'truename' => $truename])->first();
         if (empty($user)) {
             return $this->fail('用户不存在');
         }
@@ -81,7 +81,7 @@ class ReceiptController extends Base
             }
         }
         if ($repayment_type == 2) {
-            return  $this->fail('分期还款暂未开放');
+            return $this->fail('分期还款暂未开放');
             if (empty($stage)) {
                 return $this->fail('分期期数不能为空');
             }
@@ -94,34 +94,34 @@ class ReceiptController extends Base
         }
         $user = User::find($request->user_id);
 
-        if (!Util::passwordVerify($trade_password,$user->trade_password)) {
+        if (!Util::passwordVerify($trade_password, $user->trade_password)) {
             return $this->fail('交易密码错误');
         }
         if ($amount > 100 && $amount < 10000) {
-            $pay_amount = 19.8;
-        }
-        if ($amount >= 10000 && $amount < 20000) {
             $pay_amount = 29.8;
         }
-        if ($amount >= 20000 && $amount < 30000) {
+        if ($amount >= 10000 && $amount < 20000) {
             $pay_amount = 39.8;
         }
-        if ($amount >= 30000 && $amount < 40000) {
+        if ($amount >= 20000 && $amount < 30000) {
             $pay_amount = 49.8;
         }
-        if ($amount >= 40000 && $amount < 50000) {
+        if ($amount >= 30000 && $amount < 40000) {
             $pay_amount = 59.8;
         }
-        if ($amount >= 50000 && $amount < 60000) {
+        if ($amount >= 40000 && $amount < 50000) {
             $pay_amount = 69.8;
         }
-        if ($amount >= 60000 && $amount < 1000000) {
+        if ($amount >= 50000 && $amount < 60000) {
             $pay_amount = 79.8;
         }
-        if ($amount >= 1000000) {
-            $pay_amount = 99.8;
+        if ($amount >= 60000 && $amount < 1000000) {
+            $pay_amount = 89.8;
         }
-        if (!isset($pay_amount)){
+        if ($amount >= 1000000) {
+            $pay_amount = 109.8;
+        }
+        if (!isset($pay_amount)) {
             return $this->fail('金额范围错误');
         }
         $start_date = Carbon::parse($start_date);
@@ -129,7 +129,7 @@ class ReceiptController extends Base
         if ($start_date->gt($end_date)) {
             return $this->fail('起始日期不能大于还款日期');
         }
-        $interest = $rate * $rate / 100  * $start_date->diffInDays($end_date);
+        $interest = $rate * $rate / 100 * $start_date->diffInDays($end_date);
         $amount_and_interest = $amount + $interest;
         DB::connection('plugin.admin.mysql')->beginTransaction();
         try {
@@ -155,8 +155,8 @@ class ReceiptController extends Base
             ]);
             DB::connection('plugin.admin.mysql')->commit();
             Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
-            Client::send('job', ['id' => $receipt->id, 'event' => 'receipt_expire'],60*60*24);
-        }catch (\Throwable $e){
+            Client::send('job', ['id' => $receipt->id, 'event' => 'receipt_expire'], 60 * 60 * 24);
+        } catch (\Throwable $e) {
             DB::connection('plugin.admin.mysql')->rollBack();
             Log::error($e->getMessage());
             return $this->fail('失败');
@@ -179,7 +179,7 @@ class ReceiptController extends Base
         if ($receipt->user_id != $request->user_id) {
             return $this->fail('只能出借方操作');
         }
-        if (!in_array($receipt->status,[1,2])) {
+        if (!in_array($receipt->status, [1, 2])) {
             return $this->fail('凭证状态异常');
         }
         if (empty($end_date)) {
@@ -198,12 +198,12 @@ class ReceiptController extends Base
         if ($receipt->user_id != $request->user_id) {
             return $this->fail('只能出借方操作');
         }
-        if (!in_array($receipt->status,[1,2])) {
+        if (!in_array($receipt->status, [1, 2])) {
             return $this->fail('凭证状态异常');
         }
         $receipt->outstanding_amount -= $amount;
         $receipt->repaid_amount += $amount;
-        if ($receipt->outstanding_amount <= 0){
+        if ($receipt->outstanding_amount <= 0) {
             $receipt->status = 3;
         }
         $receipt->save();
@@ -217,7 +217,7 @@ class ReceiptController extends Base
         if ($receipt->user_id != $request->user_id) {
             return $this->fail('只能出借方操作');
         }
-        if (!in_array($receipt->status,[0,1,2])) {
+        if (!in_array($receipt->status, [0, 1, 2])) {
             return $this->fail('凭证状态异常');
         }
         $receipt->status = 4;
@@ -297,27 +297,47 @@ class ReceiptController extends Base
             } else {
                 $query->where('user_id', $request->user_id);
             }
+        })->when(!empty($status), function ($query) use ($status) {
+            if ($status == 1) {
+                $query->where('status', 0);
+            }
+            if ($status == 2) {
+                $query->where('status', 1);
+            }
+            if ($status == 3) {
+                $query->where('status', 2);
+            }
+            if ($status == 4) {
+                $query->where('status', 3);
+            }
+            if ($status == 5) {
+                $query->where('status', 4);
+            }
         })->get();
         $count = $total->count();
         $amount = $total->sum('amount');
-        $rows = Receipt::with(['toUser','user'])->where(function ($query) use ($type, $request,$truename) {
-            if ($type == 1) {
-                $query->where('to_user_id', $request->user_id);
-                if (!empty($truename)){
-                    $query->whereHas('user', function ($query) use ($truename) {
-                        $query->where('truename', $truename);
-                    });
+        $rows = Receipt::with(['toUser', 'user'])
+            ->where(function ($query) use ($type, $request, $truename) {
+                if ($type == 1) {
+                    $query->where('to_user_id', $request->user_id);
+                    if (!empty($truename)) {
+                        $query->whereHas('user', function ($query) use ($truename) {
+                            $query->where('truename', $truename);
+                        });
+                    }
+                } else {
+                    $query->where('user_id', $request->user_id);
+                    if (!empty($truename)) {
+                        $query->whereHas('toUser', function ($query) use ($truename) {
+                            $query->where('truename', $truename);
+                        });
+                    }
                 }
-            } else {
-                $query->where('user_id', $request->user_id);
-                if (!empty($truename)){
-                    $query->whereHas('toUser', function ($query) use ($truename) {
-                        $query->where('truename', $truename);
-                    });
+            })
+            ->when(!empty($status) || $status == 0, function ($query) use ($status) {
+                if ($status == 0) {
+                    $query->whereIn('status', [0,1,2,3]);
                 }
-            }
-        })
-            ->when($status, function ($query) use ($status) {
                 if ($status == 1) {
                     $query->where('status', 0);
                 }
@@ -335,16 +355,17 @@ class ReceiptController extends Base
                 }
             })
             ->orderBy($field, $order)
+            ->latest()
             ->paginate()
             ->items();
-        return $this->success('获取成功', ['count'=>$count,'amount'=>$amount,'list'=>$rows]);
+        return $this->success('获取成功', ['count' => $count, 'amount' => $amount, 'list' => $rows]);
     }
 
 
     function detail(Request $request)
     {
         $id = $request->post('id');
-        $receipt = Receipt::with(['user','toUser'])->find($id);
+        $receipt = Receipt::with(['user', 'toUser'])->find($id);
         if (empty($receipt)) {
             return $this->fail('凭证不存在');
         }

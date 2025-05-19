@@ -372,6 +372,7 @@ class UserController extends Base
         $amount_order = $request->post('amount_order','asc');
         $end_date_order = $request->post('end_date_order','asc');
         $rows = Receipt::where('to_user_id', $request->user_id)
+            ->whereIn('status',[1,2,3])
             ->with(['user','toUser'])
             ->orderBy('amount',$amount_order)
             ->orderBy('end_date',$end_date_order)
