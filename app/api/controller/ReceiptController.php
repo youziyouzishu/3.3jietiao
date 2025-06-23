@@ -186,6 +186,11 @@ class ReceiptController extends Base
             return $this->fail('还款日期不能为空');
         }
         $receipt->end_date = $end_date;
+
+        if ($receipt->end_date->greaterThan(Carbon::now())){
+            $receipt->status = 1;
+        }
+
         $receipt->save();
         return $this->success('延长成功');
     }

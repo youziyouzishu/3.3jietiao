@@ -43,8 +43,9 @@ class Job implements Consumer
                 Log::info("开始生成pdf");
                 $receipt = Receipt::find($id);
                 // 初始化 FPDI
-                $pdf = new Fpdi();
                 Log::info('初始化 FPDI');
+                $pdf = new Fpdi();
+                Log::info('初始化 完成');
                 // 导入现有 PDF 文件的第一页
                 $pageCount = $pdf->setSourceFile(public_path('借款协议.pdf'));
                 Log::info('导入现有 PDF 文件的第一页');
@@ -53,8 +54,8 @@ class Job implements Consumer
                     $templateId = $pdf->importPage($i);
                     $pdf->AddPage();
                     $pdf->useTemplate($templateId);
-                    $pdf->AddFont('SIMHEI', '', 'SIMHEI.TTF', true);
-                    $pdf->SetFont('SIMHEI');
+                    $pdf->AddFont('SimHei', '', 'SimHei.ttf', true);
+                    $pdf->SetFont('SimHei');
                     if ($i == 1) {
                         $pdf->SetFontSize(10);
                         $pdf->Text(56, 45.5, $receipt->ordersn);
@@ -94,8 +95,8 @@ class Job implements Consumer
                     $pdf->AddPage();
                     // 使用模板
                     $pdf->useTemplate($templateId);
-                    $pdf->AddFont('SIMHEI', '', 'SIMHEI.TTF', true);
-                    $pdf->SetFont('SIMHEI');
+                    $pdf->AddFont('SimHei', '', 'SimHei.ttf', true);
+                    $pdf->SetFont('SimHei');
                     if ($i == 1) {
                         $pdf->SetFontSize(10);
                         // 在页面上添加文本

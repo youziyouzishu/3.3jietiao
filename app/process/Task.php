@@ -11,9 +11,9 @@ class Task
 {
     public function onWorkerStart()
     {
-        new Crontab('0 0 * * *', function(){
-            Log::info('定时任务执行');
-            $receipt = Receipt::where('status', 1)->where('end_date', '<', date('Y-m-d'))->get();
+        new Crontab('0 */5 * * * *', function(){
+            $date = date('Y-m-d');
+            $receipt = Receipt::where('status', 1)->where('end_date', '<=', $date)->get();
             foreach ($receipt as $item) {
                 $item->status = 2;
                 $item->save();
