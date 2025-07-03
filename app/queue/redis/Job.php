@@ -179,7 +179,7 @@ class Job implements Consumer
         } catch (\Throwable $e) {
             Log::info('队列失败');
             Log::info(json_encode($data));
-            Log::info($e->getMessage());
+            Log::info($e->getMessage(),$e->getTrace());
             throw $e;
         }
     }
