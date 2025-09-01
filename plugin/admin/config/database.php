@@ -14,6 +14,9 @@ return  [
             'prefix'      => '',
             'strict'      => true,
             'engine'      => null,
+            'options'   => [
+                PDO::ATTR_EMULATE_PREPARES => true, // Must be false for Swoole and Swow drivers.
+            ],
         ],
     ],
 ];

@@ -47,7 +47,8 @@
     "spatie/pdf-to-image": "^3.1",
     "workerman/crontab": "^1.0",
     "lpilp/guomi": "^2.0",
-    "setasign/fpdf": "^1.8"
+    "setasign/fpdf": "^1.8",
+    "ext-pdo": "*"
   },
   "suggest": {
     "ext-event": "For better performance. "
