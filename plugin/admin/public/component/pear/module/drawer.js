@@ -20,7 +20,7 @@ layui.define(['jquery', 'element', 'layer', 'loading'], function (exports) {
 			//	默认使用 legacy 模式
 			if (option.legacy === undefined) {
 				option.legacy = true;
-			};
+			}
 			if (option.legacy) {
 				var obj = new mSlider({
 					target: option.target,

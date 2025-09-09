@@ -3,7 +3,10 @@
 namespace app\admin\model;
 
 
+use Eloquent;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use plugin\admin\app\common\Util;
 use plugin\admin\app\model\Base;
 use plugin\admin\app\model\User;
@@ -19,13 +22,13 @@ use plugin\admin\app\model\User;
  * @property string $after 变更后积分
  * @property string|null $memo 备注
  * @property string $type 类型
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersScoreLog newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersScoreLog newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersScoreLog query()
+ * @property Carbon|null $updated_at 更新时间
+ * @property Carbon|null $created_at 创建时间
+ * @method static Builder<static>|UsersScoreLog newModelQuery()
+ * @method static Builder<static>|UsersScoreLog newQuery()
+ * @method static Builder<static>|UsersScoreLog query()
  * @property-read User|null $user
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class UsersScoreLog extends Base
 {

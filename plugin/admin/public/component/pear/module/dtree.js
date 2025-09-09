@@ -272,16 +272,16 @@ layui.define(['jquery','layer','form'], function(exports) {
         };
         this.toolbarFun = {
             addTreeNode: function(param, $div) {	//添加树节点后调用的函数，用于用户自定义，如未指定则树不会发生变化
-                return ;
+
             },
             editTreeNode: function(param, $div) {	//编辑树节点后调用的函数，用于用户自定义，如未指定则树不会发生变化
-                return ;
+
             },
             editTreeLoad: function(param){	        // 编辑树的数据回显，用于打开编辑时，回填数据
-                return ;
+
             },
             delTreeNode: function(param, $div){	    //删除树后调用的函数，用于用户自定义，如未指定则树不会发生变化
-                return ;
+
             },
             loadToolbarBefore: function(buttons, param, $div){  // 右键菜单加载前的函数
                 return buttons;
@@ -306,7 +306,7 @@ layui.define(['jquery','layer','form'], function(exports) {
                 return true;
             },
             chooseDone: function(checkbarNodesParam) {	//复选框点击事件完毕后，返回该树关于复选框操作的全部信息，用于用户自定义，如未指定则树只是页面上做了修改
-                return ;
+
             }
         };
         this.iframeDefaultRequest = {   //iframe的默认参数,目的是与加载树的参数不一样
@@ -325,7 +325,7 @@ layui.define(['jquery','layer','form'], function(exports) {
 
         this.iframeFun = {
             iframeDone: function(iframeParam){	//iframe加载完毕后，用于用户自定义事件
-                return ;
+
             }
         };
         this.style = {			//树最终使用的样式集合

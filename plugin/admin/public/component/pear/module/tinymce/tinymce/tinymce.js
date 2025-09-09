@@ -12750,7 +12750,7 @@
         return firstPositionIn(elm.dom);
       }).fold(function () {
         editor.selection.normalize();
-        return;
+
       }, function (caretPos) {
         return editor.selection.setRng(caretPos.toRange());
       });
@@ -22581,25 +22581,25 @@
     };
     var deleteCommand = function (editor, caret) {
       if (backspaceDelete$9(editor)) {
-        return;
+
       } else if (backspaceDelete$4(editor, false)) {
-        return;
+
       } else if (backspaceDelete$3(editor, false)) {
-        return;
+
       } else if (backspaceDelete$6(editor, caret, false)) {
-        return;
+
       } else if (backspaceDelete$1(editor, false)) {
-        return;
+
       } else if (backspaceDelete(editor)) {
-        return;
+
       } else if (backspaceDelete$5(editor, false)) {
-        return;
+
       } else if (backspaceDelete$8(editor, false)) {
-        return;
+
       } else if (backspaceDelete$2(editor)) {
-        return;
+
       } else if (backspaceDelete$7(editor, false)) {
-        return;
+
       } else {
         nativeCommand(editor, 'Delete');
         paddEmptyBody(editor);
@@ -22607,23 +22607,23 @@
     };
     var forwardDeleteCommand = function (editor, caret) {
       if (backspaceDelete$4(editor, true)) {
-        return;
+
       } else if (backspaceDelete$3(editor, true)) {
-        return;
+
       } else if (backspaceDelete$6(editor, caret, true)) {
-        return;
+
       } else if (backspaceDelete$1(editor, true)) {
-        return;
+
       } else if (backspaceDelete(editor)) {
-        return;
+
       } else if (backspaceDelete$5(editor, true)) {
-        return;
+
       } else if (backspaceDelete$8(editor, true)) {
-        return;
+
       } else if (backspaceDelete$2(editor)) {
-        return;
+
       } else if (backspaceDelete$7(editor, true)) {
-        return;
+
       } else {
         nativeCommand(editor, 'ForwardDelete');
       }

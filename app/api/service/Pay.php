@@ -2,6 +2,7 @@
 
 namespace app\api\service;
 
+use Exception;
 use support\exception\BusinessException;
 use Yansongda\Artful\Rocket;
 use Yansongda\Supports\Collection;
@@ -16,7 +17,7 @@ class Pay
      * @param $mark
      * @param $attach
      * @return Rocket|Collection
-     * @throws \Exception
+     * @throws Exception
      */
     public static function pay($pay_type, $pay_amount, $order_no, $mark, $attach)
     {
@@ -35,7 +36,7 @@ class Pay
                 'attach' => $attach
             ]);
         } else {
-            throw new \Exception('支付类型错误');
+            throw new Exception('支付类型错误');
         }
         return $result;
     }
@@ -55,7 +56,7 @@ class Pay
                 ],
                 'reason' => $reason
             ]),
-            default => throw new \Exception('支付类型错误'),
+            default => throw new Exception('支付类型错误'),
         };
     }
 

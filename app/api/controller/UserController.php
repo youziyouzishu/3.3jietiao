@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use plugin\admin\app\common\Util;
 use plugin\admin\app\model\Option;
 use support\Request;
+use support\Response;
 
 class UserController extends Base
 {
@@ -53,7 +54,7 @@ class UserController extends Base
     /**
      * 提交满意度调查
      * @param Request $request
-     * @return \support\Response
+     * @return Response
      */
     function setFeedback(Request $request)
     {
@@ -349,7 +350,7 @@ class UserController extends Base
     /**
      * 借入统计
      * @param Request $request
-     * @return \support\Response
+     * @return Response
      */
     function getReceiptTotal(Request $request)
     {
@@ -365,7 +366,7 @@ class UserController extends Base
     /**
      * 借入明细
      * @param Request $request
-     * @return \support\Response
+     * @return Response
      */
     function getReceiptList(Request $request)
     {

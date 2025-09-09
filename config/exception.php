@@ -12,6 +12,8 @@
  * @license   http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+use Tinywan\ExceptionHandler\Handler;
+
 return [
-    '' => \Tinywan\ExceptionHandler\Handler::class,
+    '' => Handler::class,
 ];

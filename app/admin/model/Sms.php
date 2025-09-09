@@ -3,29 +3,34 @@
 namespace app\admin\model;
 
 
+use Eloquent;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Utils;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use plugin\admin\app\common\Util;
 use plugin\admin\app\model\Base;
 use support\Log;
+use Throwable;
 
 /**
  * 
  *
  * @property int $id 主键
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property Carbon|null $created_at 创建时间
+ * @property Carbon|null $updated_at 更新时间
  * @property string|null $event 事件
  * @property string|null $mobile 手机号
  * @property string|null $code 验证码
  * @property int $times 验证次数
  * @property string|null $ip IP
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Sms newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Sms newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Sms query()
- * @mixin \Eloquent
+ * @method static Builder<static>|Sms newModelQuery()
+ * @method static Builder<static>|Sms newQuery()
+ * @method static Builder<static>|Sms query()
+ * @mixin Eloquent
  */
 class Sms extends Base
 {
@@ -106,7 +111,7 @@ class Sms extends Base
                     $response = $response->getBody()->getContents();
                     $response = json_decode($response);
                     if ($response->code != 1) {
-                        throw new \Exception($response->msg);
+                        throw new Exception($response->msg);
                     }
                     self::create([
                         'event' => $event,
@@ -116,13 +121,13 @@ class Sms extends Base
                     ]);
                 },
                 function ($exception) {
-                    throw new \Exception($exception->getMessage());
+                    throw new Exception($exception->getMessage());
                 }
             );
             // 等待所有异步请求完成
             \GuzzleHttp\Promise\Utils::settle([$promise])->wait();
             return true;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::info('短信警告：' . $e->getMessage());
             return false;
         }

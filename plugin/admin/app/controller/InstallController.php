@@ -3,10 +3,12 @@
 namespace plugin\admin\app\controller;
 
 use Illuminate\Database\Capsule\Manager;
+use PDO;
 use plugin\admin\app\common\Util;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
+use Throwable;
 use Webman\Captcha\CaptchaBuilder;
 
 /**
@@ -24,7 +26,7 @@ class InstallController extends Base
      * 设置数据库
      * @param Request $request
      * @return Response
-     * @throws BusinessException|\Throwable
+     * @throws BusinessException|Throwable
      */
     public function step1(Request $request): Response
     {
@@ -54,7 +56,7 @@ class InstallController extends Base
             $db->exec("use $database");
             $smt = $db->query("show tables");
             $tables = $smt->fetchAll();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             if (stripos($e, 'Access denied for user')) {
                 return $this->json(1, '数据库用户名或密码错误');
             }
@@ -235,10 +237,10 @@ EOF;
     /**
      * 添加菜单
      * @param array $menu
-     * @param \PDO $pdo
+     * @param PDO $pdo
      * @return int
      */
-    protected function addMenu(array $menu, \PDO $pdo): int
+    protected function addMenu(array $menu, PDO $pdo): int
     {
         $allow_columns = ['title', 'key', 'icon', 'href', 'pid', 'weight', 'type'];
         $data = [];
@@ -269,10 +271,10 @@ EOF;
     /**
      * 导入菜单
      * @param array $menu_tree
-     * @param \PDO $pdo
+     * @param PDO $pdo
      * @return void
      */
-    protected function importMenu(array $menu_tree, \PDO $pdo)
+    protected function importMenu(array $menu_tree, PDO $pdo)
     {
         if (is_numeric(key($menu_tree)) && !isset($menu_tree['key'])) {
             foreach ($menu_tree as $item) {
@@ -370,22 +372,22 @@ EOF;
      * @param $password
      * @param $port
      * @param $database
-     * @return \PDO
+     * @return PDO
      */
-    protected function getPdo($host, $username, $password, $port, $database = null): \PDO
+    protected function getPdo($host, $username, $password, $port, $database = null): PDO
     {
         $dsn = "mysql:host=$host;port=$port;";
         if ($database) {
             $dsn .= "dbname=$database";
         }
         $params = [
-            \PDO::MYSQL_ATTR_INIT_COMMAND => "set names utf8mb4",
-            \PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-            \PDO::ATTR_EMULATE_PREPARES => false,
-            \PDO::ATTR_TIMEOUT => 5,
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+            PDO::MYSQL_ATTR_INIT_COMMAND => "set names utf8mb4",
+            PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_TIMEOUT => 5,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ];
-        return new \PDO($dsn, $username, $password, $params);
+        return new PDO($dsn, $username, $password, $params);
     }
 
 }

@@ -13,9 +13,11 @@
  */
 
 
+use app\middleware\ApiAuth;
+
 return [
     'api' => [
-        \app\middleware\ApiAuth::class,
+        ApiAuth::class,
     ],
     'admin' => [
         plugin\admin\api\Middleware::class

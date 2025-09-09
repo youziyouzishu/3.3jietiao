@@ -1,4 +1,7 @@
 <?php
+
+use Tinywan\Validate\Facade\Validate;
+
 return [
-    \Tinywan\Validate\Facade\Validate::class
+    Validate::class
 ];

@@ -13,7 +13,7 @@ tinymce.PluginManager.add('kityformula-editor', function(editor, url) {
                 openDialog(param);
                 return $0;
             });
-        };
+        }
     });
 
     var openDialog = function(param) {
@@ -42,7 +42,7 @@ tinymce.PluginManager.add('kityformula-editor', function(editor, url) {
                         break;
                     default:
                         break;
-                };
+                }
             }
         });
     };

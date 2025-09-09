@@ -754,7 +754,7 @@
           var styles = get$2(element, 'style');
           var backup = styles === undefined ? 'no-styles' : styles.trim();
           if (backup === clobberStyle) {
-            return;
+
           } else {
             set(element, attr, backup);
             setAll(element, dom.parseStyle(clobberStyle));

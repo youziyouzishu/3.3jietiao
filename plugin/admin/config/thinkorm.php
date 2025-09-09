@@ -18,7 +18,7 @@ return [
             // 数据库连接参数
             'params' => [
                 // 连接超时3秒
-                \PDO::ATTR_TIMEOUT => 3,
+                PDO::ATTR_TIMEOUT => 3,
             ],
             // 数据库编码默认采用utf8
             'charset' => 'utf8mb4',

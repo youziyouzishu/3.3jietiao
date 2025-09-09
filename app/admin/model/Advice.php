@@ -3,6 +3,9 @@
 namespace app\admin\model;
 
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use plugin\admin\app\model\Base;
 
 
@@ -16,13 +19,13 @@ use plugin\admin\app\model\Base;
  * @property string|null $images 图片
  * @property string|null $truename 姓名
  * @property string|null $mobile 电话
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
- * @property-read \app\admin\model\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Advice newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Advice newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Advice query()
- * @mixin \Eloquent
+ * @property Carbon|null $created_at 创建时间
+ * @property Carbon|null $updated_at 更新时间
+ * @property-read User|null $user
+ * @method static Builder<static>|Advice newModelQuery()
+ * @method static Builder<static>|Advice newQuery()
+ * @method static Builder<static>|Advice query()
+ * @mixin Eloquent
  */
 class Advice extends Base
 {

@@ -25,7 +25,7 @@ layui.define(['jquery', 'element'], function(exports) {
 					clearInterval(timer);
 					count = finalNum;
 				}
-				var t = count.toFixed(options.bit?options.bit:0);;
+				var t = count.toFixed(options.bit?options.bit:0);
 				if (t == initial) return;
 				initial = t;
 				$this.innerHTML = initial;

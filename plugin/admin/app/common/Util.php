@@ -78,7 +78,7 @@ class Util
                         if ($dur < 2592000) { // 30天内
                             return floor($dur / 86400) . '天前';
                         } else {
-                            return date('Y-m-d', $timestamp);;
+                            return date('Y-m-d', $timestamp);
                         }
                     }
                 }
@@ -285,7 +285,7 @@ class Util
 
     /**
      * 表单类型到插件的映射
-     * @return \string[][]
+     * @return string[][]
      */
     public static function methodControlMap(): array
     {

@@ -339,7 +339,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						close: true
 					}, 400);
 				} else {
-					return;
+
 				}
 			}
 
@@ -349,7 +349,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						sideMenu.selectItem(currentId);
 					});
 				} else {
-					return;
+
 				}
 			}
 
@@ -359,7 +359,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						sideMenu.selectItem(id);
 					});
 				} else {
-					return;
+
 				}
 			}
 			
@@ -369,7 +369,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						sideMenu.selectItem(id);
 					});
 				} else {
-					return;
+
 				}
 			}
 			
@@ -379,7 +379,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						sideMenu.selectItem(id);
 					});
 				} else {
-					return;
+
 				}
 			}
 
@@ -389,7 +389,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			
 			this.changeIframe = function(id, title, url) {
 				if (isMuiltTab(config) === "true" || isMuiltTab(config) === true) {
-					return;
+
 				} else {
 					sideMenu.selectItem(id);
 					bodyFrame.changePage(url, true);

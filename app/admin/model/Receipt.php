@@ -3,7 +3,10 @@
 namespace app\admin\model;
 
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use plugin\admin\app\model\Base;
 
 /**
@@ -20,23 +23,23 @@ use plugin\admin\app\model\Base;
  * @property int|null $stage 分期期数
  * @property int|null $stage_day 分期时长
  * @property string|null $stage_amount 每期应收
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt query()
+ * @property Carbon|null $created_at 创建时间
+ * @property Carbon|null $updated_at 更新时间
+ * @method static Builder<static>|Receipt newModelQuery()
+ * @method static Builder<static>|Receipt newQuery()
+ * @method static Builder<static>|Receipt query()
  * @property string $ordersn 订单编号
- * @property-read \app\admin\model\User|null $toUser
- * @property-read \app\admin\model\User|null $user
+ * @property-read User|null $toUser
+ * @property-read User|null $user
  * @property string $pay_amount 支付金额
  * @property int $pay_type 支付类型:0=无,1=微信
  * @property-read mixed $status_text
  * @property string|null $deleted_at 删除时间
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Receipt withoutTrashed()
- * @property \Illuminate\Support\Carbon|null $start_date 起始日期
- * @property \Illuminate\Support\Carbon|null $end_date 还款日期
+ * @method static Builder<static>|Receipt onlyTrashed()
+ * @method static Builder<static>|Receipt withTrashed()
+ * @method static Builder<static>|Receipt withoutTrashed()
+ * @property Carbon|null $start_date 起始日期
+ * @property Carbon|null $end_date 还款日期
  * @property-read mixed $repayment_type_text
  * @property string|null $clause_rule 条款协议
  * @property string|null $borrow_rule 借款协议
@@ -51,9 +54,9 @@ use plugin\admin\app\model\Base;
  * @property string|null $amount_and_interest 本息
  * @property string|null $repaid_amount 已还金额
  * @property string|null $outstanding_amount 待还金额
- * @property \Illuminate\Support\Carbon|null $pay_time 支付时间
- * @property \Illuminate\Support\Carbon|null $cancel_time 取消时间
- * @mixin \Eloquent
+ * @property Carbon|null $pay_time 支付时间
+ * @property Carbon|null $cancel_time 取消时间
+ * @mixin Eloquent
  */
 class Receipt extends Base
 {

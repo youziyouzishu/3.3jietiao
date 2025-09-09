@@ -14,6 +14,7 @@ use support\Db;
 use support\Log;
 use support\Request;
 use support\Response;
+use Throwable;
 use Webman\RedisQueue\Client;
 
 class ReceiptController extends Base
@@ -156,7 +157,7 @@ class ReceiptController extends Base
             DB::connection('plugin.admin.mysql')->commit();
             Client::send('job', ['id' => $receipt->id, 'event' => 'generate_pdf']);
             Client::send('job', ['id' => $receipt->id, 'event' => 'receipt_expire'], 60 * 60 * 24);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::connection('plugin.admin.mysql')->rollBack();
             Log::error($e->getMessage());
             return $this->fail('失败');
@@ -260,7 +261,7 @@ class ReceiptController extends Base
                 $result = Pay::pay($pay_type, $receipt->pay_amount, $receipt->ordersn, '出证费', 'receipt');
                 $receipt->sign = $sign;
                 $receipt->save();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::error('支付失败');
                 Log::error($e->getMessage());
                 return $this->fail('支付失败');

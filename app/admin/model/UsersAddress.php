@@ -3,7 +3,10 @@
 namespace app\admin\model;
 
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use plugin\admin\app\model\Base;
 use support\Db;
 
@@ -20,18 +23,18 @@ use support\Db;
  * @property string $mobile 手机号
  * @property string $name 姓名
  * @property string $address 详细地址
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
- * @property \Illuminate\Support\Carbon|null $deleted_at 删除时间
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersAddress newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersAddress newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersAddress onlyTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersAddress query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersAddress withTrashed()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|UsersAddress withoutTrashed()
+ * @property Carbon|null $created_at 创建时间
+ * @property Carbon|null $updated_at 更新时间
+ * @property Carbon|null $deleted_at 删除时间
+ * @method static Builder<static>|UsersAddress newModelQuery()
+ * @method static Builder<static>|UsersAddress newQuery()
+ * @method static Builder<static>|UsersAddress onlyTrashed()
+ * @method static Builder<static>|UsersAddress query()
+ * @method static Builder<static>|UsersAddress withTrashed()
+ * @method static Builder<static>|UsersAddress withoutTrashed()
  * @property string $lat 纬度
  * @property string $lng 经度
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class UsersAddress extends Base
 {

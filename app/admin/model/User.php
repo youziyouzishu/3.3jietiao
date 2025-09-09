@@ -3,8 +3,13 @@
 namespace app\admin\model;
 
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use plugin\admin\app\model\Base;
 use support\Db;
+use Throwable;
 
 
 /**
@@ -27,22 +32,22 @@ use support\Db;
  * @property string|null $join_time 注册时间
  * @property string|null $join_ip 注册ip
  * @property string|null $token token
- * @property \Illuminate\Support\Carbon|null $created_at 创建时间
- * @property \Illuminate\Support\Carbon|null $updated_at 更新时间
+ * @property Carbon|null $created_at 创建时间
+ * @property Carbon|null $updated_at 更新时间
  * @property int $role 角色
  * @property int $status 禁用
  * @property string|null $openid 微信OPENID
  * @property string|null $truename 姓名
  * @property string|null $idcard 身份证号
  * @property string|null $trade_password 交易密码
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
- * @property-read \app\admin\model\UsersFeedback|null $feedback
+ * @method static Builder<static>|User newModelQuery()
+ * @method static Builder<static>|User newQuery()
+ * @method static Builder<static>|User query()
+ * @property-read UsersFeedback|null $feedback
  * @property int $contract_status 合同管理状态:0=关闭,1=开启
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \app\admin\model\Receipt> $receipt
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \app\admin\model\Receipt> $toReceipt
- * @mixin \Eloquent
+ * @property-read Collection<int, Receipt> $receipt
+ * @property-read Collection<int, Receipt> $toReceipt
+ * @mixin Eloquent
  */
 class User extends Base
 {
@@ -103,7 +108,7 @@ class User extends Base
      * @param int $user_id 会员ID
      * @param string $memo 备注
      * @param string $type
-     * @throws \Throwable
+     * @throws Throwable
      */
     public static function score($score, $user_id, $memo, $type)
     {
@@ -120,7 +125,7 @@ class User extends Base
                 UsersScoreLog::create(['user_id' => $user_id, 'score' => $score, 'before' => $before, 'after' => $after, 'memo' => $memo, 'type' => $type]);
             }
             Db::connection('plugin.admin.mysql')->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Db::connection('plugin.admin.mysql')->rollback();
         }
     }

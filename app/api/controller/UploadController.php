@@ -7,6 +7,7 @@ use Intervention\Image\ImageManagerStatic as Image;
 use support\exception\BusinessException;
 use support\Request;
 use support\Response;
+use Throwable;
 
 /**
  * 附件管理
@@ -65,7 +66,7 @@ class UploadController extends Base
                 $ratio = $width > $height ? $max_width / $width : $max_height / $height;
             }
             $img->resize($width*$ratio, $height*$ratio)->save($realpath);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             unlink($realpath);
             return json( [
                 'code'  => 500,

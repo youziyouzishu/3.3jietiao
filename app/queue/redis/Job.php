@@ -14,6 +14,7 @@ use Spatie\PdfToImage\Exceptions\PdfDoesNotExist;
 use Spatie\PdfToImage\Pdf;
 use support\Db;
 use support\Log;
+use Throwable;
 use Webman\RedisQueue\Consumer;
 
 class Job implements Consumer
@@ -30,7 +31,7 @@ class Job implements Consumer
      * @throws PdfDoesNotExist
      * @throws PdfTypeException
      * @throws CrossReferenceException
-     * @throws \Throwable
+     * @throws Throwable
      * @throws PdfReaderException
      * @throws PdfParserException
      * @throws FilterException
@@ -71,7 +72,7 @@ class Job implements Consumer
 
             Log::info('队列任务成功', ['event' => $event, 'id' => $id]);
 
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('队列任务失败', [
                 'data' => $data,
                 'message' => $e->getMessage(),
@@ -90,7 +91,7 @@ class Job implements Consumer
 
             try {
                 Db::connection('plugin.admin.mysql')->reconnect();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::error("重连数据库失败：{'plugin.admin.mysql'}", ['error' => $e->getMessage()]);
             }
 

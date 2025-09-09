@@ -6,9 +6,11 @@ use app\admin\model\Receipt;
 use app\admin\model\User;
 use app\api\basic\Base;
 use Carbon\Carbon;
+use Exception;
 use support\Db;
 use support\Log;
 use support\Request;
+use Throwable;
 use Webman\RedisQueue\Client;
 use Yansongda\Pay\Pay;
 
@@ -22,7 +24,7 @@ class NotifyController extends Base
         $request->setParams('get', ['paytype' => 'alipay']);
         try {
             $this->pay($request);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->fail($e->getMessage());
         }
         return response('success');
@@ -33,7 +35,7 @@ class NotifyController extends Base
         $request->setParams('get', ['paytype' => 'wechat']);
         try {
             $this->pay($request);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return json(['code' => 'FAIL', 'message' => $e->getMessage()]);
         }
         return json(['code' => 'SUCCESS', 'message' => '成功']);
@@ -44,7 +46,7 @@ class NotifyController extends Base
         $request->setParams('get', ['paytype' => 'balance']);
         try {
             $this->pay($request);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return $this->fail($e->getMessage());
         }
         return $this->success();
@@ -52,7 +54,7 @@ class NotifyController extends Base
 
     /**
      * 接受回调
-     * @throws \Throwable
+     * @throws Throwable
      */
     private function pay(Request $request)
     {
@@ -95,7 +97,7 @@ class NotifyController extends Base
                     $res = $pay->callback($request->post());
                     $trade_status = $res->trade_status;
                     if ($trade_status !== 'TRADE_SUCCESS'){
-                        throw new \Exception('支付失败');
+                        throw new Exception('支付失败');
                     }
                     $out_trade_no = $res->out_trade_no;
                     $attach = $res->passback_params;
@@ -107,14 +109,14 @@ class NotifyController extends Base
                     $paytype = 4;
                     break;
                 default:
-                    throw new \Exception('支付类型错误');
+                    throw new Exception('支付类型错误');
             }
 
             switch ($attach) {
                 case 'vip':
                     $order = VipOrders::where(['ordersn' => $out_trade_no, 'status' => 0])->first();
                     if (!$order) {
-                        throw new \Exception('订单不存在');
+                        throw new Exception('订单不存在');
                     }
                     $order->status = 1;
                     $order->pay_time = Carbon::now();
@@ -130,7 +132,7 @@ class NotifyController extends Base
                 case 'receipt':
                     $order = Receipt::where(['ordersn' => $out_trade_no, 'status' => 0])->first();
                     if (!$order) {
-                        throw new \Exception('订单不存在');
+                        throw new Exception('订单不存在');
                     }
                     $order->status = 1;
                     $order->pay_time = Carbon::now();
@@ -140,7 +142,7 @@ class NotifyController extends Base
                 case 'recharge':
                     $order = RechargeOrders::where(['ordersn' => $out_trade_no, 'status' => 0])->first();
                     if (!$order) {
-                        throw new \Exception('订单不存在');
+                        throw new Exception('订单不存在');
                     }
                     $order->status = 1;
                     $order->pay_time = date('Y-m-d H:i:s');
@@ -154,14 +156,14 @@ class NotifyController extends Base
                     }
                     break;
                 default:
-                    throw new \Exception('回调错误');
+                    throw new Exception('回调错误');
             }
             Db::connection('plugin.admin.mysql')->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Db::connection('plugin.admin.mysql')->rollBack();
             Log::error('支付回调失败');
             Log::error($e->getMessage());
-            throw new \Exception($e->getMessage());
+            throw new Exception($e->getMessage());
         }
     }
 
