@@ -87,13 +87,13 @@ class Job implements Consumer
      */
     protected function reconnectDatabase()
     {
-        foreach (['default', 'plugin.admin.mysql'] as $conn) {
+
             try {
-                Db::connection($conn)->reconnect();
+                Db::connection('plugin.admin.mysql')->reconnect();
             } catch (\Throwable $e) {
-                Log::error("重连数据库失败：{$conn}", ['error' => $e->getMessage()]);
+                Log::error("重连数据库失败：{'plugin.admin.mysql'}", ['error' => $e->getMessage()]);
             }
-        }
+
     }
 
     /**
